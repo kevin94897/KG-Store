@@ -5,11 +5,8 @@ import { Camera, Image as Img, X, Upload, Check, Clipboard, Star } from 'lucide-
 // ─── Google config ────────────────────────────────────────────
 const GOOGLE_API_KEY   = import.meta.env.VITE_GOOGLE_API_KEY || ''
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
-// Scope de Photos — solo lectura
-const GOOGLE_SCOPE = [
-  'https://www.googleapis.com/auth/photoslibrary.readonly',
-  'https://www.googleapis.com/auth/drive.readonly',
-].join(' ')
+// Solo Drive — Google Photos Library API bloquea CORS desde navegador
+const GOOGLE_SCOPE     = 'https://www.googleapis.com/auth/drive.readonly'
 // ─────────────────────────────────────────────────────────────
 
 export default function ImageUploader({ images = [], onChange }) {
@@ -25,14 +22,14 @@ export default function ImageUploader({ images = [], onChange }) {
   const [urlInput, setUrlInput]             = useState('')
   const [showUrlInput, setShowUrlInput]     = useState(false)
 
-  const googleEnabled                     = !!(GOOGLE_API_KEY && GOOGLE_CLIENT_ID)
-  const [gapiReady, setGapiReady]         = useState(false)
-  const [gisReady, setGisReady]           = useState(false)
-  const [tokenClient, setTokenClient]     = useState(null)
-  const [accessToken, setAccessToken]     = useState(null)
-  const [googleLoading, setGoogleLoading] = useState(false)
+  const googleEnabled                       = !!(GOOGLE_API_KEY && GOOGLE_CLIENT_ID)
+  const [gapiReady, setGapiReady]           = useState(false)
+  const [gisReady, setGisReady]             = useState(false)
+  const [tokenClient, setTokenClient]       = useState(null)
+  const [accessToken, setAccessToken]       = useState(null)
+  const [googleLoading, setGoogleLoading]   = useState(false)
 
-  // ─── Clipboard API ────────────────────────────────────────
+  // ─── Clipboard API support ────────────────────────────────
   useEffect(() => {
     setPasteSupported(
       typeof navigator !== 'undefined' && !!navigator.clipboard?.read
@@ -74,7 +71,7 @@ export default function ImageUploader({ images = [], onChange }) {
 
   // ─── Upload a Supabase Storage ────────────────────────────
   const uploadToSupabase = async (file) => {
-    const ext = file.type?.split('/')?.[1]?.replace('jpeg', 'jpg') || 'jpg'
+    const ext = file.type?.split('/')?.[1]?.replace('jpeg','jpg') || 'jpg'
     const filename = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
     const { error: upErr } = await supabase.storage
       .from('product-images')
@@ -84,57 +81,6 @@ export default function ImageUploader({ images = [], onChange }) {
       .from('product-images')
       .getPublicUrl(filename)
     return urlData.publicUrl
-  }
-
-  // ─── Descargar imagen via proxy de Supabase Edge Function ─
-  // Google Photos bloquea CORS directo desde el browser.
-  // La estrategia: usar la baseUrl del item del Picker +
-  // parámetro de tamaño para obtener la imagen en alta calidad,
-  // luego fetchearla con el token en el header.
-  const downloadGooglePhoto = async (item, token) => {
-    // El Picker devuelve estos campos en cada documento seleccionado:
-    // item.url          → URL de la foto en Google Photos/Drive
-    // item.thumbnails   → array de thumbnails [{url, width, height}]
-    // item.id           → ID del archivo
-    // item.mimeType     → tipo MIME
-
-    // Estrategia 1: usar URL de thumbnail en máxima resolución
-    // Las URLs de Google Photos aceptan el parámetro =w0-h0 para full res
-    const thumbnails = item.thumbnails
-    if (thumbnails && thumbnails.length > 0) {
-      // Tomar el thumbnail más grande disponible
-      const best = thumbnails.reduce((a, b) =>
-        (a.width || 0) > (b.width || 0) ? a : b
-      )
-
-      // Modificar URL para obtener máxima resolución
-      // Reemplazar el tamaño al final de la URL de Google
-      let photoUrl = best.url
-      // Las URLs de Google Photos terminan en =w{n}-h{n} o =s{n}
-      // Cambiar a =w2048 para alta resolución
-      photoUrl = photoUrl.replace(/=[swh]\d+.*$/, '=w2048')
-
-      try {
-        const res = await fetch(photoUrl, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        if (res.ok) {
-          const blob = await res.blob()
-          if (blob.size > 1000) return blob // éxito
-        }
-      } catch {
-        // continuar con estrategia 2
-      }
-    }
-
-    // Estrategia 2: Drive API con alt=media (funciona para archivos en Drive)
-    const driveRes = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${item.id}?alt=media`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    )
-    if (driveRes.ok) return await driveRes.blob()
-
-    throw new Error('No se pudo descargar la imagen')
   }
 
   // ─── Procesar archivos locales ────────────────────────────
@@ -164,32 +110,28 @@ export default function ImageUploader({ images = [], onChange }) {
     }
   }, [images, onChange])
 
-  // ─── Google Photos Picker ─────────────────────────────────
+  // ─── Google Drive Picker ──────────────────────────────────
   const openGooglePicker = useCallback(() => {
     if (!gapiReady || !gisReady) return
 
     const showPicker = (token) => {
       setGoogleLoading(false)
 
-      // Vista de Google Photos
-      const photosView = new window.google.picker.PhotosView()
-      photosView.setType(window.google.picker.PhotosView.ALBUMS)
-
-      // Vista de Google Drive como respaldo
+      // Solo vista de Drive con imágenes — Photos API bloquea CORS
       const driveView = new window.google.picker.DocsView(
         window.google.picker.ViewId.DOCS_IMAGES
-      ).setIncludeFolders(true)
+      )
+        .setIncludeFolders(true)
+        .setSelectFolderEnabled(false)
 
       new window.google.picker.PickerBuilder()
-        .setTitle('Selecciona fotos')
-        .addView(photosView)
+        .setTitle('Selecciona imágenes de Google Drive')
         .addView(driveView)
         .setOAuthToken(token)
         .setDeveloperKey(GOOGLE_API_KEY)
         .enableFeature(window.google.picker.Feature.MULTISELECT_ENABLED)
         .setCallback(async (data) => {
           if (data.action !== window.google.picker.Action.PICKED) return
-
           const picked = data[window.google.picker.Response.DOCUMENTS] || []
           if (!picked.length) return
 
@@ -200,21 +142,27 @@ export default function ImageUploader({ images = [], onChange }) {
           for (let i = 0; i < picked.length; i++) {
             setProgress(Math.round((i / picked.length) * 100))
             try {
-              const item = picked[i]
-              const mimeType = item.mimeType || 'image/jpeg'
+              const fileId   = picked[i].id
+              const mimeType = picked[i].mimeType || 'image/jpeg'
 
-              const blob = await downloadGooglePhoto(item, token)
-              const ext  = mimeType.split('/')[1]?.replace('jpeg', 'jpg') || 'jpg'
+              // Drive API sí permite descarga con token OAuth desde el navegador
+              const res = await fetch(
+                `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              )
+              if (!res.ok) throw new Error(`HTTP ${res.status}`)
+
+              const blob = await res.blob()
+              const ext  = mimeType.split('/')[1]?.replace('jpeg','jpg') || 'jpg'
               const file = new File(
                 [blob],
-                `gphotos-${Date.now()}-${i}.${ext}`,
+                `drive-${Date.now()}-${i}.${ext}`,
                 { type: mimeType }
               )
-              const publicUrl = await uploadToSupabase(file)
-              urls.push(publicUrl)
+              urls.push(await uploadToSupabase(file))
             } catch (e) {
-              console.error('Error descargando foto:', e)
-              setError('Error al descargar una imagen. Intenta con otra foto.')
+              console.error('Error descargando de Drive:', e)
+              setError('No se pudo descargar la imagen. Asegúrate de que esté en tu Google Drive.')
             }
             setProgress(Math.round(((i + 1) / picked.length) * 100))
           }
@@ -227,7 +175,6 @@ export default function ImageUploader({ images = [], onChange }) {
         .setVisible(true)
     }
 
-    // Reusar token si existe y no expiró
     if (accessToken) {
       setGoogleLoading(true)
       showPicker(accessToken)
@@ -244,7 +191,6 @@ export default function ImageUploader({ images = [], onChange }) {
         setError('No se pudo autenticar con Google.')
       }
     }
-    // prompt vacío = no pedir consentimiento si ya lo dio antes
     tokenClient.requestAccessToken({ prompt: '' })
   }, [gapiReady, gisReady, tokenClient, accessToken, images, onChange])
 
@@ -323,10 +269,7 @@ export default function ImageUploader({ images = [], onChange }) {
     }
   }, [])
 
-  const remove = (idx) => {
-    onChange(images.filter((_, i) => i !== idx))
-    setSelectedIdx(null)
-  }
+  const remove    = (idx) => { onChange(images.filter((_, i) => i !== idx)); setSelectedIdx(null) }
   const moveFirst = (idx) => {
     const arr = [...images]
     const [item] = arr.splice(idx, 1)
@@ -347,28 +290,27 @@ export default function ImageUploader({ images = [], onChange }) {
             return (
               <div
                 key={url + i}
-                className={`relative aspect-square rounded-xl overflow-hidden bg-dark-600
-                  cursor-pointer transition-all duration-200
-                  ${isSelected
-                    ? 'ring-2 ring-accent ring-offset-2 ring-offset-dark scale-[0.97]'
-                    : ''
-                  }`}
+                className={`relative aspect-square rounded-xl overflow-hidden bg-dark-600 cursor-pointer transition-all duration-200
+                  ${isSelected ? 'ring-2 ring-accent ring-offset-2 ring-offset-dark scale-[0.97]' : ''}`}
                 onClick={() => setSelectedIdx(prev => prev === i ? null : i)}
               >
                 <img src={url} alt="" className="w-full h-full object-cover" />
 
+                {/* Badge principal */}
                 {i === 0 && (
                   <div className="absolute top-1.5 left-1.5 bg-accent text-black text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
                     <Star size={8} fill="black" /> Principal
                   </div>
                 )}
 
+                {/* Número */}
                 {!isSelected && i !== 0 && (
                   <div className="absolute bottom-1.5 right-1.5 bg-black/60 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                     {i + 1}
                   </div>
                 )}
 
+                {/* Overlay tap */}
                 {isSelected && (
                   <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center gap-2 p-2">
                     {i !== 0 && (
@@ -396,27 +338,23 @@ export default function ImageUploader({ images = [], onChange }) {
       )}
 
       {images.length > 0 && selectedIdx === null && (
-        <p className="text-center text-white/20 text-xs">
-          Toca una imagen para ver opciones
-        </p>
+        <p className="text-center text-white/20 text-xs">Toca una imagen para ver opciones</p>
       )}
 
       {/* Botones carga */}
       <div className={`grid gap-3 ${googleEnabled ? 'grid-cols-3' : 'grid-cols-2'}`}>
         <button type="button" onClick={() => cameraRef.current?.click()} disabled={uploading}
-          className="border-2 border-dashed border-white/10 rounded-2xl py-5 flex flex-col
-            items-center gap-2.5 text-white/40 text-xs font-bold uppercase tracking-wider
-            active:border-accent/60 active:text-accent active:bg-accent/5
-            transition-all disabled:opacity-40">
+          className="border-2 border-dashed border-white/10 rounded-2xl py-5 flex flex-col items-center gap-2.5
+            text-white/40 text-xs font-bold uppercase tracking-wider
+            active:border-accent/60 active:text-accent active:bg-accent/5 transition-all disabled:opacity-40">
           <Camera size={26} />
           <span>Cámara</span>
         </button>
 
         <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
-          className="border-2 border-dashed border-white/10 rounded-2xl py-5 flex flex-col
-            items-center gap-2.5 text-white/40 text-xs font-bold uppercase tracking-wider
-            active:border-accent/60 active:text-accent active:bg-accent/5
-            transition-all disabled:opacity-40">
+          className="border-2 border-dashed border-white/10 rounded-2xl py-5 flex flex-col items-center gap-2.5
+            text-white/40 text-xs font-bold uppercase tracking-wider
+            active:border-accent/60 active:text-accent active:bg-accent/5 transition-all disabled:opacity-40">
           <Img size={26} />
           <span>Galería</span>
         </button>
@@ -424,10 +362,9 @@ export default function ImageUploader({ images = [], onChange }) {
         {googleEnabled && (
           <button type="button" onClick={openGooglePicker}
             disabled={uploading || googleLoading || !gapiReady || !gisReady}
-            className="border-2 border-dashed border-white/10 rounded-2xl py-5 flex flex-col
-              items-center gap-2.5 text-white/40 text-xs font-bold uppercase tracking-wider
-              active:border-accent/60 active:text-accent active:bg-accent/5
-              transition-all disabled:opacity-40">
+            className="border-2 border-dashed border-white/10 rounded-2xl py-5 flex flex-col items-center gap-2.5
+              text-white/40 text-xs font-bold uppercase tracking-wider
+              active:border-accent/60 active:text-accent active:bg-accent/5 transition-all disabled:opacity-40">
             {googleLoading
               ? <div className="w-6 h-6 border-2 border-white/20 border-t-accent rounded-full animate-spin" />
               : (
@@ -439,25 +376,22 @@ export default function ImageUploader({ images = [], onChange }) {
                 </svg>
               )
             }
-            <span>{googleLoading ? 'Abriendo...' : 'G. Photos'}</span>
+            <span>{googleLoading ? 'Abriendo...' : 'G. Drive'}</span>
           </button>
         )}
       </div>
 
       {/* Pegar imagen */}
       <div className="space-y-2">
-        <p className="text-[11px] font-bold uppercase tracking-widest text-white/20">
-          Pegar imagen
-        </p>
+        <p className="text-[11px] font-bold uppercase tracking-widest text-white/20">Pegar imagen</p>
 
         {pasteSupported && (
           <button type="button" onClick={handlePasteButton} disabled={uploading}
-            className={`w-full border-2 border-dashed rounded-2xl py-4 flex items-center
-              justify-center gap-2.5 text-sm font-bold transition-all disabled:opacity-40
+            className={`w-full border-2 border-dashed rounded-2xl py-4 flex items-center justify-center
+              gap-2.5 text-sm font-bold transition-all disabled:opacity-40
               ${pasteFlash
                 ? 'border-accent bg-accent/10 text-accent'
-                : 'border-white/10 text-white/40 active:border-accent/60 active:text-accent active:bg-accent/5'
-              }`}>
+                : 'border-white/10 text-white/40 active:border-accent/60 active:text-accent active:bg-accent/5'}`}>
             <Clipboard size={20} />
             {pasteFlash ? '¡Pegado!' : 'Pegar imagen copiada'}
           </button>
@@ -491,20 +425,23 @@ export default function ImageUploader({ images = [], onChange }) {
             </button>
           </div>
         )}
+
+        {googleEnabled && (
+          <p className="text-[11px] text-white/15 leading-relaxed">
+            Para usar G. Drive: sube primero la foto a tu Google Drive, luego toca "G. Drive" y selecciónala.
+          </p>
+        )}
       </div>
 
       {/* Progreso */}
       {uploading && (
         <div className="space-y-1.5">
           <div className="flex justify-between text-xs text-white/30">
-            <span className="flex items-center gap-1.5">
-              <Upload size={11} className="animate-bounce" /> Subiendo...
-            </span>
+            <span className="flex items-center gap-1.5"><Upload size={11} className="animate-bounce" /> Subiendo...</span>
             <span className="font-mono">{progress}%</span>
           </div>
           <div className="h-2 bg-dark-600 rounded-full overflow-hidden">
-            <div className="h-full bg-accent rounded-full transition-all duration-200"
-              style={{ width: `${progress}%` }} />
+            <div className="h-full bg-accent rounded-full transition-all duration-200" style={{ width: `${progress}%` }} />
           </div>
         </div>
       )}
@@ -516,10 +453,8 @@ export default function ImageUploader({ images = [], onChange }) {
         </div>
       )}
 
-      <input ref={cameraRef} type="file" accept="image/*" capture="environment" multiple
-        className="hidden" onChange={e => handleFiles(e.target.files)} />
-      <input ref={fileRef} type="file" accept="image/*" multiple
-        className="hidden" onChange={e => handleFiles(e.target.files)} />
+      <input ref={cameraRef} type="file" accept="image/*" capture="environment" multiple className="hidden" onChange={e => handleFiles(e.target.files)} />
+      <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={e => handleFiles(e.target.files)} />
     </div>
   )
 }
