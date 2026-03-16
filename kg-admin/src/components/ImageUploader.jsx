@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { supabase } from '../utils/supabase'
 import { Camera, Image as Img, X, Upload, Check, Clipboard, Star } from 'lucide-react'
-import { optimizeImages } from './utils/ImageOptimizer'
+import { optimizeImages } from '../utils/imageOptimizer'
 
 const GOOGLE_API_KEY   = import.meta.env.VITE_GOOGLE_API_KEY || ''
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
