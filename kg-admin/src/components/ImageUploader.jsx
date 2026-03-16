@@ -1,47 +1,95 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { supabase } from '../utils/supabase'
-import { Camera, Image as Img, X, Upload, Check, Clipboard } from 'lucide-react'
+import { Camera, Image as Img, X, Upload, Check, Clipboard, Star } from 'lucide-react'
+
+// ─── Google Picker ────────────────────────────────────────────
+const GOOGLE_API_KEY   = import.meta.env.VITE_GOOGLE_API_KEY || ''
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+const GOOGLE_SCOPE     = 'https://www.googleapis.com/auth/drive.readonly'
+// ─────────────────────────────────────────────────────────────
 
 export default function ImageUploader({ images = [], onChange }) {
   const fileRef   = useRef()
   const cameraRef = useRef()
+
   const [uploading, setUploading]           = useState(false)
   const [progress, setProgress]             = useState(0)
   const [error, setError]                   = useState('')
+  const [selectedIdx, setSelectedIdx]       = useState(null) // imagen activa (tap)
   const [pasteSupported, setPasteSupported] = useState(false)
   const [pasteFlash, setPasteFlash]         = useState(false)
   const [urlInput, setUrlInput]             = useState('')
   const [showUrlInput, setShowUrlInput]     = useState(false)
 
-  // Detectar si Clipboard API está disponible
-  // Android Chrome: sí. Safari iOS: no (navigator.clipboard.read no existe)
+  // Google Picker state
+  const googleEnabled                       = !!(GOOGLE_API_KEY && GOOGLE_CLIENT_ID)
+  const [gapiReady, setGapiReady]           = useState(false)
+  const [gisReady, setGisReady]             = useState(false)
+  const [tokenClient, setTokenClient]       = useState(null)
+  const [accessToken, setAccessToken]       = useState(null)
+  const [googleLoading, setGoogleLoading]   = useState(false)
+
+  // ─── Clipboard API support ────────────────────────────────
   useEffect(() => {
     setPasteSupported(
-      typeof navigator !== 'undefined' &&
-      !!navigator.clipboard?.read
+      typeof navigator !== 'undefined' && !!navigator.clipboard?.read
     )
   }, [])
 
-  // Upload a Supabase Storage
+  // ─── Cargar Google APIs ───────────────────────────────────
+  useEffect(() => {
+    if (!googleEnabled) return
+
+    const gapiScript = document.createElement('script')
+    gapiScript.src = 'https://apis.google.com/js/api.js'
+    gapiScript.onload = () => {
+      window.gapi.load('client:picker', async () => {
+        await window.gapi.client.init({ apiKey: GOOGLE_API_KEY })
+        setGapiReady(true)
+      })
+    }
+    document.body.appendChild(gapiScript)
+
+    const gisScript = document.createElement('script')
+    gisScript.src = 'https://accounts.google.com/gsi/client'
+    gisScript.onload = () => {
+      const client = window.google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: GOOGLE_SCOPE,
+        callback: () => {},
+      })
+      setTokenClient(client)
+      setGisReady(true)
+    }
+    document.body.appendChild(gisScript)
+
+    return () => {
+      if (document.body.contains(gapiScript)) document.body.removeChild(gapiScript)
+      if (document.body.contains(gisScript)) document.body.removeChild(gisScript)
+    }
+  }, [googleEnabled])
+
+  // ─── Upload a Supabase Storage ────────────────────────────
   const uploadToSupabase = async (file) => {
     const ext = file.type?.split('/')?.[1] || 'jpg'
     const filename = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-    const { error } = await supabase.storage
+    const { error: upErr } = await supabase.storage
       .from('product-images')
       .upload(filename, file, { cacheControl: '3600', upsert: false })
-    if (error) throw error
+    if (upErr) throw upErr
     const { data: urlData } = supabase.storage
       .from('product-images')
       .getPublicUrl(filename)
     return urlData.publicUrl
   }
 
-  // Procesar archivos
+  // ─── Procesar archivos ────────────────────────────────────
   const handleFiles = useCallback(async (files) => {
     const arr = Array.from(files).filter(f => f.type.startsWith('image/'))
     if (!arr.length) return
     setUploading(true)
     setError('')
+    setSelectedIdx(null)
     try {
       const urls = []
       for (let i = 0; i < arr.length; i++) {
@@ -63,45 +111,109 @@ export default function ImageUploader({ images = [], onChange }) {
     }
   }, [images, onChange])
 
-  // Botón pegar — Android Chrome via Clipboard API
+  // ─── Google Picker ────────────────────────────────────────
+  const openGooglePicker = useCallback(() => {
+    if (!gapiReady || !gisReady) return
+
+    const showPicker = (token) => {
+      setGoogleLoading(false)
+
+      const photosView = new window.google.picker.PhotosView()
+      const driveView  = new window.google.picker.DocsView(
+        window.google.picker.ViewId.DOCS_IMAGES
+      ).setIncludeFolders(true)
+
+      new window.google.picker.PickerBuilder()
+        .addView(photosView)
+        .addView(driveView)
+        .setOAuthToken(token)
+        .setDeveloperKey(GOOGLE_API_KEY)
+        .enableFeature(window.google.picker.Feature.MULTISELECT_ENABLED)
+        .setCallback(async (data) => {
+          if (data.action !== window.google.picker.Action.PICKED) return
+          const picked = data[window.google.picker.Response.DOCUMENTS] || []
+          if (!picked.length) return
+
+          setUploading(true)
+          setError('')
+          const urls = []
+
+          for (let i = 0; i < picked.length; i++) {
+            setProgress(Math.round((i / picked.length) * 100))
+            try {
+              const res = await fetch(
+                `https://www.googleapis.com/drive/v3/files/${picked[i].id}?alt=media`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              )
+              if (!res.ok) throw new Error('Error descargando')
+              const blob = await res.blob()
+              const ext  = blob.type.split('/')[1] || 'jpg'
+              const file = new File([blob], `gphotos-${Date.now()}.${ext}`, { type: blob.type })
+              urls.push(await uploadToSupabase(file))
+            } catch (e) {
+              console.error('Error Google foto:', e)
+            }
+            setProgress(Math.round(((i + 1) / picked.length) * 100))
+          }
+
+          onChange([...images, ...urls])
+          setUploading(false)
+          setProgress(0)
+        })
+        .build()
+        .setVisible(true)
+    }
+
+    if (accessToken) { setGoogleLoading(true); showPicker(accessToken); return }
+
+    setGoogleLoading(true)
+    tokenClient.callback = (response) => {
+      if (response.access_token) {
+        setAccessToken(response.access_token)
+        showPicker(response.access_token)
+      } else {
+        setGoogleLoading(false)
+        setError('No se pudo autenticar con Google.')
+      }
+    }
+    tokenClient.requestAccessToken({ prompt: 'consent' })
+  }, [gapiReady, gisReady, tokenClient, accessToken, images, onChange])
+
+  // ─── Pegar portapapeles (Android Chrome) ─────────────────
   const handlePasteButton = async () => {
     setError('')
     try {
-      const clipboardItems = await navigator.clipboard.read()
+      const items = await navigator.clipboard.read()
       const imageFiles = []
-      for (const item of clipboardItems) {
+      for (const item of items) {
         const imageType = item.types.find(t => t.startsWith('image/'))
         if (imageType) {
           const blob = await item.getType(imageType)
-          const file = new File(
+          imageFiles.push(new File(
             [blob],
             `paste-${Date.now()}.${imageType.split('/')[1] || 'png'}`,
             { type: imageType }
-          )
-          imageFiles.push(file)
+          ))
         }
       }
-      if (imageFiles.length === 0) {
-        setError('No hay imagen copiada. Mantén presionada una imagen → "Copiar imagen" y vuelve aquí.')
+      if (!imageFiles.length) {
+        setError('No hay imagen copiada. Mantén presionada una imagen → "Copiar imagen".')
         return
       }
       setPasteFlash(true)
       setTimeout(() => setPasteFlash(false), 1200)
       await handleFiles(imageFiles)
     } catch (err) {
-      if (err.name === 'NotAllowedError') {
-        setError('Permite el acceso al portapapeles cuando el navegador lo solicite.')
-      } else {
-        setError('No se pudo leer el portapapeles. Usa Galería para subir la imagen.')
-      }
+      setError(err.name === 'NotAllowedError'
+        ? 'Permite acceso al portapapeles cuando el navegador lo solicite.'
+        : 'No se pudo leer el portapapeles. Usa Galería.')
     }
   }
 
-  // Pegar URL de imagen (fallback iOS)
+  // ─── Pegar URL (fallback iOS) ─────────────────────────────
   const handleUrlAdd = () => {
     const url = urlInput.trim()
-    if (!url) return
-    if (!/^https?:\/\/.+/i.test(url)) {
+    if (!url || !/^https?:\/\/.+/i.test(url)) {
       setError('Ingresa una URL válida que empiece con https://')
       return
     }
@@ -111,166 +223,284 @@ export default function ImageUploader({ images = [], onChange }) {
     setError('')
   }
 
-  // Ctrl+V / Cmd+V en desktop
+  // ─── Ctrl+V desktop ──────────────────────────────────────
   useEffect(() => {
-    const handlePaste = (e) => {
+    const onPaste = (e) => {
       const items = e.clipboardData?.items
       if (!items) return
-      const imageFiles = []
+      const files = []
       for (let i = 0; i < items.length; i++) {
         if (items[i].kind === 'file' && items[i].type.startsWith('image/')) {
-          const file = items[i].getAsFile()
-          if (file) imageFiles.push(file)
+          const f = items[i].getAsFile()
+          if (f) files.push(f)
         }
       }
-      if (imageFiles.length > 0) {
-        e.preventDefault()
-        setPasteFlash(true)
-        setTimeout(() => setPasteFlash(false), 1200)
-        handleFiles(imageFiles)
-      }
+      if (files.length) { e.preventDefault(); handleFiles(files) }
     }
-    window.addEventListener('paste', handlePaste)
-    return () => window.removeEventListener('paste', handlePaste)
+    window.addEventListener('paste', onPaste)
+    return () => window.removeEventListener('paste', onPaste)
   }, [handleFiles])
 
-  const remove    = (idx) => onChange(images.filter((_, i) => i !== idx))
+  // ─── Helpers ──────────────────────────────────────────────
+  const remove    = (idx) => { onChange(images.filter((_, i) => i !== idx)); setSelectedIdx(null) }
   const moveFirst = (idx) => {
     const arr = [...images]
     const [item] = arr.splice(idx, 1)
     arr.unshift(item)
     onChange(arr)
+    setSelectedIdx(0)
   }
 
-  return (
-    <div className="space-y-3">
+  const handleTap = (idx) => {
+    // Tap en imagen seleccionada → deseleccionar
+    // Tap en otra → seleccionar
+    setSelectedIdx(prev => prev === idx ? null : idx)
+  }
 
-      {/* Grid de imágenes */}
+  // Click fuera de las imágenes → deseleccionar
+  useEffect(() => {
+    const onClickOut = (e) => {
+      if (!e.target.closest('[data-image-grid]')) setSelectedIdx(null)
+    }
+    document.addEventListener('touchstart', onClickOut)
+    document.addEventListener('mousedown', onClickOut)
+    return () => {
+      document.removeEventListener('touchstart', onClickOut)
+      document.removeEventListener('mousedown', onClickOut)
+    }
+  }, [])
+
+  // ─── Render ───────────────────────────────────────────────
+  return (
+    <div className="space-y-4">
+
+      {/* ── Grid de imágenes ── */}
       {images.length > 0 && (
-        <div className="grid grid-cols-3 gap-2">
-          {images.map((url, i) => (
-            <div key={url + i} className="relative aspect-square rounded-xl overflow-hidden bg-dark-600 group">
-              <img src={url} alt="" className="w-full h-full object-cover" />
-              {i === 0 && (
-                <div className="absolute top-1 left-1 bg-accent text-black text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md">
-                  Principal
-                </div>
-              )}
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-active:opacity-100 flex items-center justify-center gap-1.5 transition-opacity">
-                {i !== 0 && (
-                  <button type="button" onClick={() => moveFirst(i)} className="bg-accent text-black rounded-full p-1.5">
-                    <Check size={13} />
-                  </button>
+        <div data-image-grid className="grid grid-cols-3 gap-2">
+          {images.map((url, i) => {
+            const isSelected = selectedIdx === i
+            return (
+              <div
+                key={url + i}
+                className={`relative aspect-square rounded-xl overflow-hidden bg-dark-600 cursor-pointer
+                  transition-all duration-200
+                  ${isSelected ? 'ring-2 ring-accent ring-offset-2 ring-offset-dark scale-[0.97]' : ''}`}
+                onClick={() => handleTap(i)}
+              >
+                <img src={url} alt="" className="w-full h-full object-cover" />
+
+                {/* Badge principal */}
+                {i === 0 && (
+                  <div className="absolute top-1.5 left-1.5 bg-accent text-black text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                    <Star size={8} fill="black" />
+                    Principal
+                  </div>
                 )}
-                <button type="button" onClick={() => remove(i)} className="bg-red-600 text-white rounded-full p-1.5">
-                  <X size={13} />
-                </button>
+
+                {/* Número */}
+                {!isSelected && i !== 0 && (
+                  <div className="absolute bottom-1.5 right-1.5 bg-black/60 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                    {i + 1}
+                  </div>
+                )}
+
+                {/* Overlay con botones — visible al tap */}
+                {isSelected && (
+                  <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center gap-2 p-2">
+                    {i !== 0 && (
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); moveFirst(i) }}
+                        className="w-full flex items-center justify-center gap-2 bg-accent text-black font-bold text-xs py-2.5 rounded-xl active:scale-95 transition-all"
+                      >
+                        <Star size={13} fill="black" />
+                        Hacer principal
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); remove(i) }}
+                      className="w-full flex items-center justify-center gap-2 bg-red-600 text-white font-bold text-xs py-2.5 rounded-xl active:scale-95 transition-all"
+                    >
+                      <X size={13} />
+                      Eliminar
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
-      {/* Cámara + Galería */}
-      <div className="grid grid-cols-2 gap-2">
-        <button type="button" onClick={() => cameraRef.current?.click()} disabled={uploading}
-          className="border-2 border-dashed border-white/10 rounded-xl py-4 flex flex-col items-center gap-2
-            text-white/30 text-xs font-bold uppercase tracking-wider active:border-accent/40 active:text-accent
-            transition-all disabled:opacity-40">
-          <Camera size={22} />
-          Cámara
+      {/* Hint tap */}
+      {images.length > 0 && selectedIdx === null && (
+        <p className="text-center text-white/20 text-xs">
+          Toca una imagen para ver opciones
+        </p>
+      )}
+
+      {/* ── Botones de carga ── */}
+      <div className={`grid gap-3 ${googleEnabled ? 'grid-cols-3' : 'grid-cols-2'}`}>
+
+        {/* Cámara */}
+        <button
+          type="button"
+          onClick={() => cameraRef.current?.click()}
+          disabled={uploading}
+          className="border-2 border-dashed border-white/10 rounded-2xl py-5 flex flex-col
+            items-center gap-2.5 text-white/40 text-xs font-bold uppercase tracking-wider
+            active:border-accent/60 active:text-accent active:bg-accent/5
+            transition-all disabled:opacity-40"
+        >
+          <Camera size={26} />
+          <span>Cámara</span>
         </button>
-        <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
-          className="border-2 border-dashed border-white/10 rounded-xl py-4 flex flex-col items-center gap-2
-            text-white/30 text-xs font-bold uppercase tracking-wider active:border-accent/40 active:text-accent
-            transition-all disabled:opacity-40">
-          <Img size={22} />
-          Galería
+
+        {/* Galería */}
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+          className="border-2 border-dashed border-white/10 rounded-2xl py-5 flex flex-col
+            items-center gap-2.5 text-white/40 text-xs font-bold uppercase tracking-wider
+            active:border-accent/60 active:text-accent active:bg-accent/5
+            transition-all disabled:opacity-40"
+        >
+          <Img size={26} />
+          <span>Galería</span>
         </button>
+
+        {/* Google Photos */}
+        {googleEnabled && (
+          <button
+            type="button"
+            onClick={openGooglePicker}
+            disabled={uploading || googleLoading || !gapiReady || !gisReady}
+            className="border-2 border-dashed border-white/10 rounded-2xl py-5 flex flex-col
+              items-center gap-2.5 text-white/40 text-xs font-bold uppercase tracking-wider
+              active:border-accent/60 active:text-accent active:bg-accent/5
+              transition-all disabled:opacity-40"
+          >
+            {googleLoading ? (
+              <div className="w-6 h-6 border-2 border-white/20 border-t-accent rounded-full animate-spin" />
+            ) : (
+              <svg width="26" height="26" viewBox="0 0 48 48" fill="none">
+                <path d="M24 9.5C28.14 9.5 31.84 11.07 34.57 13.65L40.25 7.97C36.32 4.36 31.13 2 24 2C14.72 2 6.8 7.37 3 15.08L9.69 20.26C11.37 14.11 17.19 9.5 24 9.5Z" fill="#EA4335"/>
+                <path d="M46.1 24.55C46.1 22.84 45.96 21.18 45.7 19.56H24V28.99H36.42C35.85 31.99 34.17 34.53 31.68 36.24L38.19 41.32C42.07 37.73 44.45 32.71 44.45 26.63C44.45 25.93 46.1 25.24 46.1 24.55Z" fill="#4285F4"/>
+                <path d="M9.69 27.74C9.24 26.43 8.98 25.04 8.98 23.6C8.98 22.16 9.24 20.77 9.69 19.46L3 14.28C1.63 17.07 0.9 20.24 0.9 23.6C0.9 26.96 1.63 30.13 3 32.92L9.69 27.74Z" fill="#FBBC05"/>
+                <path d="M24 46.2C31.13 46.2 37.1 43.88 41.33 39.83L34.82 34.75C32.87 36.08 30.43 36.87 27.07 36.87C20.26 36.87 14.37 32.26 12.69 26.11L6 31.29C9.8 39 17.72 46.2 24 46.2Z" fill="#34A853"/>
+              </svg>
+            )}
+            <span>{googleLoading ? 'Abriendo...' : 'G. Photos'}</span>
+          </button>
+        )}
       </div>
 
-      {/* Sección pegar */}
+      {/* ── Pegar imagen ── */}
       <div className="space-y-2">
         <p className="text-[11px] font-bold uppercase tracking-widest text-white/20">
-          Pegar imagen copiada
+          Pegar imagen
         </p>
 
-        {/* Android Chrome: botón Clipboard API */}
+        {/* Android Chrome */}
         {pasteSupported && (
-          <button type="button" onClick={handlePasteButton} disabled={uploading}
-            className={`w-full border-2 border-dashed rounded-xl py-3.5 flex items-center justify-center
-              gap-2 text-sm font-bold transition-all disabled:opacity-40
+          <button
+            type="button"
+            onClick={handlePasteButton}
+            disabled={uploading}
+            className={`w-full border-2 border-dashed rounded-2xl py-4 flex items-center
+              justify-center gap-2.5 text-sm font-bold transition-all disabled:opacity-40
               ${pasteFlash
                 ? 'border-accent bg-accent/10 text-accent'
-                : 'border-white/10 text-white/40 active:border-accent/40 active:text-accent'}`}>
-            <Clipboard size={18} />
-            {pasteFlash ? '¡Imagen pegada!' : 'Pegar imagen copiada'}
+                : 'border-white/10 text-white/40 active:border-accent/60 active:text-accent active:bg-accent/5'
+              }`}
+          >
+            <Clipboard size={20} />
+            {pasteFlash ? '¡Pegado!' : 'Pegar imagen copiada'}
           </button>
         )}
 
-        {/* iOS Safari: botón para mostrar input de URL */}
+        {/* iOS fallback URL */}
         {!pasteSupported && !showUrlInput && (
-          <button type="button" onClick={() => setShowUrlInput(true)}
-            className="w-full border-2 border-dashed border-white/10 rounded-xl py-3.5 flex items-center
-              justify-center gap-2 text-sm font-bold text-white/40 active:border-accent/40 active:text-accent transition-all">
-            <Clipboard size={18} />
+          <button
+            type="button"
+            onClick={() => setShowUrlInput(true)}
+            className="w-full border-2 border-dashed border-white/10 rounded-2xl py-4 flex items-center
+              justify-center gap-2.5 text-sm font-bold text-white/40
+              active:border-accent/60 active:text-accent active:bg-accent/5 transition-all"
+          >
+            <Clipboard size={20} />
             Pegar URL de imagen
           </button>
         )}
 
-        {/* Input URL */}
         {showUrlInput && (
           <div className="flex gap-2">
             <input
               autoFocus
               type="url"
               inputMode="url"
-              placeholder="Pega aquí la URL de la imagen..."
+              placeholder="https://..."
               value={urlInput}
               onChange={e => setUrlInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleUrlAdd()}
-              className="flex-1 bg-dark-700 border border-white/10 rounded-xl px-3 py-2.5
+              className="flex-1 bg-dark-700 border border-white/10 rounded-xl px-3 py-3
                 text-sm text-white placeholder-white/20 outline-none focus:border-accent/50"
             />
-            <button type="button" onClick={handleUrlAdd}
-              className="bg-accent text-black font-bold px-4 rounded-xl text-sm active:scale-95 transition-all">
-              <Check size={16} />
+            <button
+              type="button"
+              onClick={handleUrlAdd}
+              className="bg-accent text-black font-bold px-4 rounded-xl active:scale-95 transition-all"
+            >
+              <Check size={18} />
             </button>
-            <button type="button" onClick={() => { setShowUrlInput(false); setUrlInput('') }}
-              className="bg-dark-600 text-white/40 px-3 rounded-xl active:scale-95 transition-all">
-              <X size={16} />
+            <button
+              type="button"
+              onClick={() => { setShowUrlInput(false); setUrlInput('') }}
+              className="bg-dark-600 text-white/40 px-3 rounded-xl active:scale-95 transition-all"
+            >
+              <X size={18} />
             </button>
           </div>
         )}
 
-        {/* Instrucciones según dispositivo */}
         <p className="text-[11px] text-white/15 leading-relaxed">
           {pasteSupported
-            ? 'En tu celular: mantén presionada la imagen → "Copiar imagen" → vuelve y toca "Pegar imagen copiada".'
-            : 'En iPhone: mantén presionada la imagen → "Copiar" → abre el campo de URL y pega con mantener presionado → "Pegar".'
+            ? 'Mantén presionada la imagen → "Copiar imagen" → toca "Pegar imagen copiada".'
+            : 'iPhone: usa Galería o pega la URL de la imagen.'
           }
         </p>
       </div>
 
-      {/* Progreso */}
+      {/* ── Progreso ── */}
       {uploading && (
         <div className="space-y-1.5">
           <div className="flex justify-between text-xs text-white/30">
-            <span className="flex items-center gap-1.5"><Upload size={11} className="animate-bounce" /> Subiendo...</span>
+            <span className="flex items-center gap-1.5">
+              <Upload size={11} className="animate-bounce" />
+              Subiendo...
+            </span>
             <span className="font-mono">{progress}%</span>
           </div>
-          <div className="h-1.5 bg-dark-600 rounded-full overflow-hidden">
-            <div className="h-full bg-accent rounded-full transition-all duration-200" style={{ width: `${progress}%` }} />
+          <div className="h-2 bg-dark-600 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-accent rounded-full transition-all duration-200"
+              style={{ width: `${progress}%` }}
+            />
           </div>
         </div>
       )}
 
+      {/* Error */}
       {error && (
-        <p className="text-red-400 text-xs flex items-start gap-1.5">
-          <X size={12} className="shrink-0 mt-0.5" />{error}
-        </p>
+        <div className="flex items-start gap-2 bg-red-900/20 border border-red-900/40 rounded-xl px-3 py-2.5">
+          <X size={13} className="text-red-400 shrink-0 mt-0.5" />
+          <p className="text-red-400 text-xs leading-relaxed">{error}</p>
+        </div>
       )}
 
+      {/* Inputs ocultos */}
       <input ref={cameraRef} type="file" accept="image/*" capture="environment" multiple className="hidden" onChange={e => handleFiles(e.target.files)} />
       <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={e => handleFiles(e.target.files)} />
     </div>

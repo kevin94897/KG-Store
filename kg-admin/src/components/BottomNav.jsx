@@ -5,7 +5,7 @@ const tabs = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/productos', icon: Package, label: 'Productos' },
   { to: '/categorias', icon: Tag, label: 'Categorías' },
-  { to: '/pedidos', icon: ShoppingCart, label: 'Pedidos' },
+  // { to: '/pedidos', icon: ShoppingCart, label: 'Pedidos' },
   { to: '/cuotas', icon: CreditCard, label: 'Cuotas' }
 ]
 
