@@ -76,7 +76,11 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 bg-black flex flex-col"
-      style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
+      style={{
+        height: '100dvh',
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+      }}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 shrink-0">
@@ -93,14 +97,14 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
 
       {/* Área imagen — ocupa todo el espacio restante, centrada */}
       <div
-        className="flex-1 relative overflow-hidden cursor-pointer"
+        className="flex-1 relative overflow-hidden cursor-pointer min-h-0"
         onClick={onClose}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
         {/* Imagen centrada absoluta */}
-        <div className="absolute inset-0 flex items-center justify-center px-2">
+        <div className="absolute inset-0 flex items-center justify-center px-4 py-2">
           <img
             key={current}
             src={images[current]}
