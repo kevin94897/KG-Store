@@ -99,7 +99,7 @@ export default function ImageUploader({ images = [], onChange }) {
           ...(authHeader ? { Authorization: authHeader } : {}),
         },
         body: JSON.stringify({
-          mediaItemId:  item.id,
+          fileId:       item.id,
           mimeType:     item.mimeType || 'image/jpeg',
           accessToken:  token,
           thumbnailUrl: bestThumb?.url || null,

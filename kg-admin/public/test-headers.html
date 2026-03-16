@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>COOP Headers Verification</title>
+</head>
+<body>
+  <h1>COOP Headers Verification</h1>
+  <pre id="output"></pre>
+
+  <script>
+    const output = document.getElementById('output');
+    
+    // Check COOP header
+    fetch('/').then(res => {
+      output.textContent += 'Response Headers:\n';
+      output.textContent += `COOP: ${res.headers.get('Cross-Origin-Opener-Policy')}\n`;
+      output.textContent += `COEP: ${res.headers.get('Cross-Origin-Embedder-Policy')}\n`;
+      output.textContent += `CORP: ${res.headers.get('Cross-Origin-Resource-Policy')}\n\n`;
+      output.textContent += `Status: ${res.status} ${res.statusText}\n`;
+    });
+
+    // Check environment variables
+    setTimeout(() => {
+      output.textContent += '\nEnvironment Variables:\n';
+      output.textContent += `VITE_GOOGLE_API_KEY: ${import.meta.env.VITE_GOOGLE_API_KEY ? '✓ Set' : '✗ Missing'}\n`;
+      output.textContent += `VITE_GOOGLE_CLIENT_ID: ${import.meta.env.VITE_GOOGLE_CLIENT_ID ? '✓ Set' : '✗ Missing'}\n`;
+      output.textContent += `Current Origin: ${window.location.origin}\n`;
+    }, 100);
+  </script>
+</body>
+</html>
