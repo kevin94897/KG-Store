@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { supabase } from '../utils/supabase'
+import { optimizeImage } from '../utils/imageOptimizer'
 import { Camera, Image as Img, X, Upload, Check, Clipboard, Star } from 'lucide-react'
 
 const GOOGLE_API_KEY   = import.meta.env.VITE_GOOGLE_API_KEY || ''
@@ -65,7 +66,8 @@ export default function ImageUploader({ images = [], onChange }) {
 
   // Upload directo a Supabase (para cámara/galería)
   const uploadToSupabase = async (file) => {
-    const ext = file.type?.split('/')?.[1]?.replace('jpeg', 'jpg') || 'jpg'
+    let ext = file.type?.split('/')?.[1] || 'jpg'
+    ext = ext.replace('jpeg', 'jpg')
     const filename = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
     const { error: upErr } = await supabase.storage
       .from('product-images')
@@ -99,7 +101,7 @@ export default function ImageUploader({ images = [], onChange }) {
           ...(authHeader ? { Authorization: authHeader } : {}),
         },
         body: JSON.stringify({
-          fileId:       item.id,
+          fileId:       item.id,        // ← era 'mediaItemId', debe ser 'fileId'
           mimeType:     item.mimeType || 'image/jpeg',
           accessToken:  token,
           thumbnailUrl: bestThumb?.url || null,
@@ -128,7 +130,11 @@ export default function ImageUploader({ images = [], onChange }) {
       const urls = []
       for (let i = 0; i < arr.length; i++) {
         setProgress(Math.round((i / arr.length) * 100))
-        try { urls.push(await uploadToSupabase(arr[i])) }
+        try { 
+          // Optimizar imagen antes de subir
+          const optimizedFile = await optimizeImage(arr[i])
+          urls.push(await uploadToSupabase(optimizedFile))
+        }
         catch { urls.push(URL.createObjectURL(arr[i])) }
         setProgress(Math.round(((i + 1) / arr.length) * 100))
       }
@@ -156,12 +162,17 @@ export default function ImageUploader({ images = [], onChange }) {
           window.google.picker.ViewId.DOCS_IMAGES
         ).setIncludeFolders(true)
 
+        // Origen explícito — evita el bug donde parent apunta a /favicon.ico
+        const origin = window.location.protocol + '//' + window.location.host
+
         const picker = new window.google.picker.PickerBuilder()
           .setTitle('Selecciona fotos')
           .addView(photosView)
           .addView(driveView)
           .setOAuthToken(token)
           .setDeveloperKey(GOOGLE_API_KEY)
+          .setOrigin(origin)
+          .setAppId(GOOGLE_CLIENT_ID.split('-')[0])
           .enableFeature(window.google.picker.Feature.MULTISELECT_ENABLED)
           .setCallback(async (data) => {
             console.log('[ImageUploader] Picker callback triggered:', { action: data.action })
