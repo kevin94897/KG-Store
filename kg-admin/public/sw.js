@@ -17,17 +17,27 @@ self.addEventListener('activate', (event) => {
 })
 
 // ─── Interceptar Share Target POST ───────────────────────────
-// iOS Safari llama a /compartir con un multipart/form-data
-// que contiene los archivos compartidos.
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url)
 
+  // Solo interceptar el endpoint de compartir
   if (url.pathname === '/compartir' && event.request.method === 'POST') {
     event.respondWith(handleShareTarget(event.request))
     return
   }
 
-  // Para el resto, red normal (sin cache agresivo en admin)
+  // ⚠️ NO interceptar requests externos — dejar pasar sin modificar:
+  // - Supabase Storage (subida de imágenes)
+  // - Supabase Edge Functions
+  // - Google APIs
+  // - Cualquier origen distinto al propio
+  const isExternal = url.origin !== self.location.origin
+  if (isExternal) {
+    // Dejar que el navegador maneje directamente sin SW
+    return
+  }
+
+  // Para requests internos (assets, páginas), red normal
   event.respondWith(fetch(event.request))
 })
 

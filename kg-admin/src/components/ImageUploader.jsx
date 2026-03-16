@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { supabase } from '../utils/supabase'
-import { optimizeImage } from '../utils/imageOptimizer'
 import { Camera, Image as Img, X, Upload, Check, Clipboard, Star } from 'lucide-react'
+import { optimizeImages } from '../utils/ImageOptimizer'
 
 const GOOGLE_API_KEY   = import.meta.env.VITE_GOOGLE_API_KEY || ''
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
@@ -66,8 +66,7 @@ export default function ImageUploader({ images = [], onChange }) {
 
   // Upload directo a Supabase (para cámara/galería)
   const uploadToSupabase = async (file) => {
-    let ext = file.type?.split('/')?.[1] || 'jpg'
-    ext = ext.replace('jpeg', 'jpg')
+    const ext = file.type?.split('/')?.[1]?.replace('jpeg', 'jpg') || 'jpg'
     const filename = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
     const { error: upErr } = await supabase.storage
       .from('product-images')
@@ -127,16 +126,14 @@ export default function ImageUploader({ images = [], onChange }) {
     setError('')
     setSelectedIdx(null)
     try {
+      // Optimizar primero antes de subir
+      const optimized = await optimizeImages(arr)
       const urls = []
-      for (let i = 0; i < arr.length; i++) {
-        setProgress(Math.round((i / arr.length) * 100))
-        try { 
-          // Optimizar imagen antes de subir
-          const optimizedFile = await optimizeImage(arr[i])
-          urls.push(await uploadToSupabase(optimizedFile))
-        }
-        catch { urls.push(URL.createObjectURL(arr[i])) }
-        setProgress(Math.round(((i + 1) / arr.length) * 100))
+      for (let i = 0; i < optimized.length; i++) {
+        setProgress(Math.round((i / optimized.length) * 100))
+        try { urls.push(await uploadToSupabase(optimized[i])) }
+        catch { urls.push(URL.createObjectURL(optimized[i])) }
+        setProgress(Math.round(((i + 1) / optimized.length) * 100))
       }
       onChange([...images, ...urls])
     } catch {
