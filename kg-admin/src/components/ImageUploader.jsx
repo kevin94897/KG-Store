@@ -5,7 +5,7 @@ import { Camera, Image as Img, X, Upload, Check, Clipboard, Star } from 'lucide-
 // ─── Google Picker ────────────────────────────────────────────
 const GOOGLE_API_KEY   = import.meta.env.VITE_GOOGLE_API_KEY || ''
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
-const GOOGLE_SCOPE     = 'https://www.googleapis.com/auth/drive.readonly'
+const GOOGLE_SCOPE     = 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/photoslibrary.readonly'
 // ─────────────────────────────────────────────────────────────
 
 export default function ImageUploader({ images = [], onChange }) {
@@ -141,17 +141,28 @@ export default function ImageUploader({ images = [], onChange }) {
           for (let i = 0; i < picked.length; i++) {
             setProgress(Math.round((i / picked.length) * 100))
             try {
-              const res = await fetch(
-                `https://www.googleapis.com/drive/v3/files/${picked[i].id}?alt=media`,
+              const fileId = picked[i].id
+
+              // Obtener metadata del archivo incluyendo el link de descarga
+              const metaRes = await fetch(
+                `https://www.googleapis.com/drive/v3/files/${fileId}?fields=id,name,mimeType,size,webContentLink`,
                 { headers: { Authorization: `Bearer ${token}` } }
               )
-              if (!res.ok) throw new Error('Error descargando')
+              const meta = await metaRes.json()
+
+              // Descargar el contenido del archivo
+              const res = await fetch(
+                `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              )
+              if (!res.ok) throw new Error(`Error ${res.status} descargando`)
               const blob = await res.blob()
-              const ext  = blob.type.split('/')[1] || 'jpg'
-              const file = new File([blob], `gphotos-${Date.now()}.${ext}`, { type: blob.type })
+              const ext  = (meta.mimeType || blob.type).split('/')[1]?.replace('jpeg','jpg') || 'jpg'
+              const file = new File([blob], `gphotos-${Date.now()}.${ext}`, { type: blob.type || meta.mimeType })
               urls.push(await uploadToSupabase(file))
             } catch (e) {
               console.error('Error Google foto:', e)
+              setError(`Error descargando imagen. Asegúrate de que el archivo sea de tu propiedad en Drive.`)
             }
             setProgress(Math.round(((i + 1) / picked.length) * 100))
           }
