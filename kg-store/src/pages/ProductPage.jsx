@@ -80,12 +80,9 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 shrink-0">
-        {/* Contador */}
         <span className="text-white/50 text-sm font-semibold">
           {current + 1} <span className="text-white/20">/</span> {images.length}
         </span>
-
-        {/* Cerrar */}
         <button
           onClick={onClose}
           className="w-11 h-11 bg-white/10 rounded-full flex items-center justify-center text-white active:bg-white/20 transition-all"
@@ -94,42 +91,44 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
         </button>
       </div>
 
-      {/* Imagen principal con swipe */}
+      {/* Área imagen — ocupa todo el espacio restante, centrada */}
       <div
-        className="flex-1 flex items-center justify-center overflow-hidden relative cursor-pointer"
+        className="flex-1 relative overflow-hidden cursor-pointer"
+        onClick={onClose}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        onClick={onClose}
       >
-        <img
-          key={current}
-          src={images[current]}
-          alt=""
-          className="max-w-full max-h-full object-contain select-none fade-in"
-          style={{
-            transform: `translateX(${dragOffset}px)`,
-            transition: dragOffset === 0 ? 'transform 0.2s ease' : 'none',
-            userSelect: 'none',
-            WebkitUserSelect: 'none',
-            draggable: false,
-          }}
-          draggable={false}
-          onClick={(e) => e.stopPropagation()}
-        />
+        {/* Imagen centrada absoluta */}
+        <div className="absolute inset-0 flex items-center justify-center px-2">
+          <img
+            key={current}
+            src={images[current]}
+            alt=""
+            className="max-w-full max-h-full object-contain select-none fade-in"
+            style={{
+              transform: `translateX(${dragOffset}px)`,
+              transition: dragOffset === 0 ? 'transform 0.2s ease' : 'none',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+            }}
+            draggable={false}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
 
-        {/* Flechas desktop — ocultas en móvil */}
+        {/* Flechas desktop */}
         {images.length > 1 && (
           <>
             <button
-              onClick={prev}
-              className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full items-center justify-center text-white transition-all"
+              onClick={(e) => { e.stopPropagation(); prev() }}
+              className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full items-center justify-center text-white transition-all z-10"
             >
               <ChevronLeft size={28} />
             </button>
             <button
-              onClick={next}
-              className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full items-center justify-center text-white transition-all"
+              onClick={(e) => { e.stopPropagation(); next() }}
+              className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full items-center justify-center text-white transition-all z-10"
             >
               <ChevronRight size={28} />
             </button>
@@ -140,32 +139,24 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
       {/* Footer — dots + thumbnails */}
       {images.length > 1 && (
         <div className="shrink-0 pb-3">
-          {/* Dots */}
           <div className="flex justify-center gap-1.5 mb-3">
             {images.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrent(i)}
                 className={`transition-all rounded-full ${
-                  i === current
-                    ? 'w-5 h-2 bg-white'
-                    : 'w-2 h-2 bg-white/30'
+                  i === current ? 'w-5 h-2 bg-white' : 'w-2 h-2 bg-white/30'
                 }`}
               />
             ))}
           </div>
-
-          {/* Thumbnails horizontales */}
           <div className="flex gap-2 px-4 overflow-x-auto pb-1 scrollbar-hide">
             {images.map((img, i) => (
               <button
                 key={i}
                 onClick={() => setCurrent(i)}
                 className={`shrink-0 w-14 h-14 rounded-xl overflow-hidden border-2 transition-all
-                  ${i === current
-                    ? 'border-white opacity-100'
-                    : 'border-transparent opacity-40 active:opacity-70'
-                  }`}
+                  ${i === current ? 'border-white opacity-100' : 'border-transparent opacity-40 active:opacity-70'}`}
               >
                 <img src={img} alt="" className="w-full h-full object-cover" draggable={false} />
               </button>
@@ -174,10 +165,9 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
         </div>
       )}
 
-      {/* Hint swipe — solo en móvil, solo si hay más de 1 imagen */}
       {images.length > 1 && (
         <p className="md:hidden text-center text-white/20 text-xs pb-3 shrink-0">
-          Desliza para navegar
+          Desliza para navegar · Toca fuera para cerrar
         </p>
       )}
     </div>
