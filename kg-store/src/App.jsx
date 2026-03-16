@@ -4,6 +4,7 @@ import FloatingWhatsApp from './components/FloatingWhatsApp'
 import HomePage from './pages/HomePage'
 import StorePage from './pages/StorePage'
 import ProductPage from './pages/ProductPage'
+import InstallmentsPage from './pages/InstallmentsPage' 
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/tienda" element={<StorePage />} />
         <Route path="/producto/:slug" element={<ProductPage />} />
+        <Route path="/cuotas" element={<InstallmentsPage />} />
         <Route path="*" element={<StorePage />} />
       </Routes>
       {/* <FloatingWhatsApp /> */}

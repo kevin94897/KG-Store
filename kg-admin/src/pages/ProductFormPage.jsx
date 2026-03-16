@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../utils/supabase'
 import ImageUploader from '../components/ImageUploader'
+import { useSharedImagesOnLoad } from '../hooks/usePWA'
 import {
   ArrowLeft, Save, Trash2, Check, AlertCircle,
-  ChevronDown, ToggleLeft, ToggleRight
+  ChevronDown, ToggleLeft, ToggleRight, Share2
 } from 'lucide-react'
 
 const EMPTY = {
@@ -39,14 +40,49 @@ export default function ProductFormPage() {
   const isEdit = Boolean(id) && id !== 'nuevo'
   const navigate = useNavigate()
 
-  const [form, setForm] = useState(EMPTY)
+  const [form, setForm]         = useState(EMPTY)
   const [categories, setCategories] = useState([])
-  const [section, setSection] = useState('general')
-  const [loading, setLoading] = useState(isEdit)
-  const [saving, setSaving] = useState(false)
+  const [section, setSection]   = useState('general')
+  const [loading, setLoading]   = useState(isEdit)
+  const [saving, setSaving]     = useState(false)
   const [deleting, setDeleting] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
+  const [error, setError]       = useState('')
+  const [success, setSuccess]   = useState(false)
+  // Banner cuando llegan imágenes compartidas
+  const [sharedBanner, setSharedBanner] = useState(false)
+
+  // ── Recibir imágenes compartidas desde Google Photos ──────
+  useSharedImagesOnLoad({
+    onSharedImages: async (files) => {
+      if (!files.length) return
+
+      // Subir cada archivo a Supabase Storage
+      setSharedBanner(true)
+      setTimeout(() => setSharedBanner(false), 3000)
+
+      const urls = []
+      for (const file of files) {
+        try {
+          const ext = file.type.split('/')[1] || 'jpg'
+          const filename = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+          const { error: upErr } = await supabase.storage
+            .from('product-images')
+            .upload(filename, file, { cacheControl: '3600', upsert: false })
+          if (upErr) throw upErr
+          const { data } = supabase.storage.from('product-images').getPublicUrl(filename)
+          urls.push(data.publicUrl)
+        } catch (e) {
+          console.error('Error subiendo imagen compartida:', e)
+        }
+      }
+
+      if (urls.length) {
+        setForm(prev => ({ ...prev, images: [...prev.images, ...urls] }))
+        // Ir directo a la pestaña de imágenes
+        setSection('imágenes')
+      }
+    }
+  })
 
   useEffect(() => {
     supabase.from('categories').select('id, name, slug').order('name')
@@ -160,7 +196,14 @@ export default function ProductFormPage() {
       </div>
 
       <div className="px-4 pt-5 space-y-4">
-        {/* Alerts */}
+        {/* Banner imágenes compartidas */}
+        {sharedBanner && (
+          <div className="flex items-center gap-2 bg-accent/10 border border-accent/30 rounded-xl px-4 py-3 text-accent text-sm">
+            <Share2 size={16} />
+            ¡Imágenes recibidas desde Google Photos!
+          </div>
+        )}
+
         {error && (
           <div className="flex items-start gap-2 bg-red-900/20 border border-red-900/40 rounded-xl px-4 py-3 text-red-400 text-sm">
             <AlertCircle size={15} className="shrink-0 mt-0.5" /> {error}
@@ -187,19 +230,16 @@ export default function ProductFormPage() {
             </div>
             <div>
               <label className="label">SKU</label>
-              <input className="input font-mono" placeholder="REF-001"
-                value={form.sku} onChange={e => set('sku', e.target.value)} />
+              <input className="input font-mono" placeholder="REF-001" value={form.sku} onChange={e => set('sku', e.target.value)} />
             </div>
             <div>
               <label className="label">Descripción corta</label>
-              <textarea className="input resize-none" rows={3}
-                placeholder="Descripción breve visible en la tienda..."
+              <textarea className="input resize-none" rows={3} placeholder="Descripción breve visible en la tienda..."
                 value={form.short_description} onChange={e => set('short_description', e.target.value)} />
             </div>
             <div>
               <label className="label">Descripción completa</label>
-              <textarea className="input resize-none" rows={6}
-                placeholder="Descripción detallada..."
+              <textarea className="input resize-none" rows={6} placeholder="Descripción detallada..."
                 value={form.description} onChange={e => set('description', e.target.value)} />
             </div>
             <div>
@@ -240,7 +280,6 @@ export default function ProductFormPage() {
                 <input className="input pl-9 font-mono" type="number" inputMode="decimal" placeholder="0.00 (opcional)"
                   value={form.sale_price} onChange={e => set('sale_price', e.target.value)} />
               </div>
-              <p className="text-xs text-white/20 mt-1 pl-1">Deja vacío si no hay oferta</p>
             </div>
             {form.regular_price && form.sale_price && parseFloat(form.sale_price) < parseFloat(form.regular_price) && (
               <div className="bg-accent/10 border border-accent/20 rounded-xl px-4 py-3 text-accent text-sm font-bold font-mono">
@@ -272,7 +311,9 @@ export default function ProductFormPage() {
         {/* ── IMÁGENES ── */}
         {section === 'imágenes' && (
           <div className="fade-up">
-            <p className="text-xs text-white/25 mb-3">La primera imagen será la principal. Toca la imagen para opciones.</p>
+            <p className="text-xs text-white/25 mb-3">
+              La primera imagen será la principal.
+            </p>
             <ImageUploader images={form.images} onChange={imgs => set('images', imgs)} />
           </div>
         )}
@@ -291,16 +332,11 @@ export default function ProductFormPage() {
                 </button>
               )
             })}
-            {categories.length === 0 && (
-              <p className="text-center text-white/25 py-8 text-sm">
-                Sin categorías. <a onClick={() => navigate('/categorias')} className="text-accent underline cursor-pointer">Crear una</a>
-              </p>
-            )}
           </div>
         )}
       </div>
 
-      {/* Save bar fixed */}
+      {/* Save bar */}
       <div className="fixed bottom-16 inset-x-0 px-4 py-3 bg-gradient-to-t from-dark to-transparent z-40">
         <button className="btn-accent w-full py-4 text-base" onClick={handleSave} disabled={saving}>
           {saving

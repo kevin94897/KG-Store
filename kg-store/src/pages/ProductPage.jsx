@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useProduct } from '../hooks/useProducts'
 import { ArrowLeft, Truck, MessageCircle, Share2, ChevronLeft, ChevronRight, Star } from 'lucide-react'
+import useSeo from '../hooks/useSeo'
 
 function ImageGallery({ images }) {
   const [current, setCurrent] = useState(0)
@@ -79,6 +80,13 @@ function ImageGallery({ images }) {
 export default function ProductPage() {
   const { slug } = useParams()
   const { product, loading } = useProduct(slug)
+
+  useSeo({
+    title: product ? `${product.name} | KG Store` : 'KG Store | Producto',
+    description: product ? (product.short_description || `Compra ${product.name} en cuotas`) : 'Detalle del producto en KG Store',
+    url: `https://tu-dominio.com/producto/${slug}`,
+    image: product?.images?.[0] || 'https://tu-dominio.com/og-image.jpg'
+  })
 
   const handleWhatsApp = () => {
     const msg = `Hola, me interesa: *${product.name}* — S/${product.regular_price}\n${window.location.href}`

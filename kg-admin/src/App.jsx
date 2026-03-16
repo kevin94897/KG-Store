@@ -7,6 +7,7 @@ import ProductsPage from './pages/ProductsPage'
 import ProductFormPage from './pages/ProductFormPage'
 import CategoriesPage from './pages/CategoriesPage'
 import OrdersPage from './pages/OrdersPage'
+import InstallmentRequestsPage from './pages/InstallmentRequestsPage'
 
 function AppRoutes() {
   const { user, loading } = useAuth()
@@ -28,6 +29,7 @@ function AppRoutes() {
         <Route path="/productos/:id" element={<ProductFormPage />} />
         <Route path="/categorias" element={<CategoriesPage />} />
         <Route path="/pedidos" element={<OrdersPage />} />
+        <Route path="/cuotas" element={<InstallmentRequestsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <BottomNav />

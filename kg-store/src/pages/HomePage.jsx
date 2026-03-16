@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useProducts, useCategories } from '../hooks/useProducts'
 import ProductCard, { ProductCardSkeleton } from '../components/ProductCard'
 import { ArrowRight, Package, ChevronRight, Star } from 'lucide-react'
+import useSeo from '../hooks/useSeo'
 
 function HeroSection() {
   return (
@@ -27,8 +28,8 @@ function HeroSection() {
           <Link to="/tienda" className="btn-accent flex-1 text-sm py-3">
             Ver tienda <ArrowRight size={16} />
           </Link>
-          <Link to="/pedido" className="btn-outline flex-none text-sm py-3 px-5">
-            Mi pedido
+          <Link to="/cuotas" className="btn-outline flex-none text-sm py-3 px-5">
+            ¿Pago en cuotas?
           </Link>
         </div>
       </div>
@@ -56,6 +57,13 @@ function InstallmentBanner() {
 export default function HomePage() {
   const { products: featured, loading } = useProducts({ limit: 6 })
   const categories = useCategories()
+
+  useSeo({
+    title: 'KG Store | Home — Figuras, ediciones y coleccionables',
+    description: 'KG Store: compra figuras, ediciones de PS4/PS5 y coleccionables con envío rápido y cuotas.',
+    url: 'https://tu-dominio.com/',
+    image: 'https://tu-dominio.com/og-image.jpg'
+  })
 
   return (
     <div className="pt-14">
@@ -128,7 +136,7 @@ export default function HomePage() {
             <p className="text-white/30 text-xs">Entérate de nuevos coleccionables en stock</p>
           </div>
         </div>
-        <p className="text-white/15 text-xs text-center mt-6">© 2024 KG Store. Todos los derechos reservados.</p>
+        <p className="text-white/15 text-xs text-center mt-6">© 2026 KG Store. Todos los derechos reservados.</p>
       </footer>
     </div>
   )

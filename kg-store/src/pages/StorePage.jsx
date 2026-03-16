@@ -4,6 +4,7 @@ import { supabase } from '../utils/supabase'
 import { useCategories } from '../hooks/useProducts'
 import ProductCard, { ProductCardSkeleton } from '../components/ProductCard'
 import { SlidersHorizontal, X } from 'lucide-react'
+import useSeo from '../hooks/useSeo'
 
 export default function StorePage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -54,6 +55,13 @@ export default function StorePage() {
   }
 
   const allCats = [{ slug: 'todos', name: 'Todos' }, ...categories]
+
+  useSeo({
+    title: 'KG Store | Tienda - Figuras y coleccionables',
+    description: 'Explora KG Store, la tienda de figuras, coleccionables y ediciones de juegos con envíos y cuotas.',
+    url: 'https://tu-dominio.com/tienda',
+    image: 'https://tu-dominio.com/og-image.jpg'
+  })
 
   return (
     <div className="pt-14 pb-safe min-h-dvh">

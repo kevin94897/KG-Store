@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Package, Tag, ShoppingCart } from 'lucide-react'
+import { LayoutDashboard, Package, Tag, ShoppingCart, CreditCard } from 'lucide-react'
 
 const tabs = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/productos', icon: Package, label: 'Productos' },
   { to: '/categorias', icon: Tag, label: 'Categorías' },
   { to: '/pedidos', icon: ShoppingCart, label: 'Pedidos' },
+  { to: '/cuotas', icon: CreditCard, label: 'Cuotas' }
 ]
 
 export default function BottomNav() {

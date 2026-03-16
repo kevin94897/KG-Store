@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Sitemap: https://colecciones.grupo-gomez.com/sitemap.xml
+Host: https://colecciones.grupo-gomez.com
