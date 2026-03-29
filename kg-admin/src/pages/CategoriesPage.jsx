@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../utils/supabase'
-import { Plus, Pencil, Trash2, Check, X, Tag, FolderOpen } from 'lucide-react'
+import { Plus, Pencil, Trash2, Check, X, Tag, FolderOpen, ArrowLeft } from 'lucide-react'
 
 function Form({ initial, onSave, onCancel }) {
   const [name, setName] = useState(initial?.name || '')
@@ -42,6 +43,7 @@ function Form({ initial, onSave, onCancel }) {
 }
 
 export default function CategoriesPage() {
+  const navigate = useNavigate()
   const [cats, setCats] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -81,12 +83,18 @@ export default function CategoriesPage() {
             <h1 className="text-xl font-semibold text-white">Categorías</h1>
             <p className="text-xs text-white/25">{cats.length} categorías</p>
           </div>
-          <button
-            onClick={() => { setEditing(null); setShowForm(p => !p) }}
-            className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent/20"
-          >
-            {showForm && !editing ? <X size={18} className="text-black" /> : <Plus size={18} className="text-black" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => navigate(-1)}
+              className="w-9 h-9 bg-dark-600 border border-white/5 rounded-xl flex items-center justify-center text-white/50 active:text-white shrink-0">
+              <ArrowLeft size={18} />
+            </button>
+            <button
+              onClick={() => { setEditing(null); setShowForm(p => !p) }}
+              className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent/20"
+            >
+              {showForm && !editing ? <X size={18} className="text-black" /> : <Plus size={18} className="text-black" />}
+            </button>
+          </div>
         </div>
       </div>
 

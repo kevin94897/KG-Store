@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../utils/supabase'
-import { Search, Plus, RefreshCw, Package, ChevronRight } from 'lucide-react'
+import { Search, Plus, RefreshCw, Package, ChevronRight, Tag } from 'lucide-react'
 
 import { thumbUrl, thumbFallback } from '../utils/thumbUrl'
 const STATUS_STYLE = {
@@ -122,6 +122,12 @@ export default function ProductsPage() {
             >
               <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
             </button>
+            <Link
+              to="/categorias"
+              className="w-9 h-9 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent/20"
+            >
+              <Tag size={18} className="text-black" />
+            </Link>
             <Link
               to="/productos/nuevo"
               className="w-9 h-9 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent/20"

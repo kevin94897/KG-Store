@@ -8,18 +8,18 @@ import useSeo from '../hooks/useSeo'
 
 export default function StorePage() {
   const [searchParams, setSearchParams] = useSearchParams()
-  
+
   // ── Data state ──
   const [allProducts, setAllProducts] = useState([])
   const [loading, setLoading] = useState(true)
-  
+
   // ── Filter state ──
   const [activeCategory, setActiveCategory] = useState(searchParams.get('cat') || 'todos')
   const [search, setSearch] = useState(searchParams.get('search') || '')
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest')
   const [stockFilter, setStockFilter] = useState(searchParams.get('stock') || 'all')
   const [showFilters, setShowFilters] = useState(false)
-  
+
   const categories = useCategories()
 
   // ── Sync state with URL params ──
@@ -72,7 +72,7 @@ export default function StorePage() {
     result.sort((a, b) => {
       if (sortBy === 'name-asc') return a.name.localeCompare(b.name)
       if (sortBy === 'name-desc') return b.name.localeCompare(a.name)
-      
+
       const priceA = a.sale_price || a.regular_price || 0
       const priceB = b.sale_price || b.regular_price || 0
 
@@ -101,14 +101,22 @@ export default function StorePage() {
 
   const setCat = (slug) => updateParams({ cat: slug })
   const clearSearch = () => updateParams({ search: '' })
-  
-  const allCats = [{ slug: 'todos', name: 'Todos' }, ...categories]
+
+  const activeCatSlugs = useMemo(
+    () => new Set(allProducts.map(p => p.categories?.slug).filter(Boolean)),
+    [allProducts]
+  )
+
+  const allCats = [
+    { slug: 'todos', name: 'Todos' },
+    ...categories.filter(c => loading || activeCatSlugs.has(c.slug)),
+  ]
 
   useSeo({
     title: 'KG Store | Tienda - Figuras y coleccionables',
     description: 'Explora KG Store, la tienda de figuras, coleccionables y ediciones de juegos con envíos y cuotas.',
-    url: 'https://tu-dominio.com/tienda',
-    image: 'https://tu-dominio.com/og-image.jpg'
+    url: 'https://colecciones.grupo-gomez.com/tienda',
+    image: 'https://colecciones.grupo-gomez.com/og-image.jpg'
   })
 
   return (
@@ -135,7 +143,7 @@ export default function StorePage() {
       {/* Advanced Filters Toggle */}
       <div className="px-4 pb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-           {/* Active search filter indicator */}
+          {/* Active search filter indicator */}
           {search && (
             <div className="inline-flex items-center gap-1.5 bg-accent/10 border border-accent/20 rounded-full px-3 py-1">
               <span className="text-accent text-xs font-semibold">"{search}"</span>
@@ -145,7 +153,7 @@ export default function StorePage() {
             </div>
           )}
         </div>
-        <button 
+        <button
           onClick={() => setShowFilters(!showFilters)}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-colors
             ${showFilters ? 'bg-white/10 border-white/20 text-white' : 'bg-transparent border-white/10 text-white/50 active:bg-white/5'}`}

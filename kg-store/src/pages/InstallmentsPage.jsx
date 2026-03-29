@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 
 // ─── Utilidades ───────────────────────────────────────────────
-const INSTALLMENT_OPTIONS = [2, 4, 8, 12]
+const INSTALLMENT_OPTIONS = [2, 3, 4]
 const FREQUENCY_OPTIONS = [
   { value: 'semanal', label: 'Semanal' },
   { value: 'mensual', label: 'Mensual' },
@@ -23,14 +23,16 @@ function calcPerInstallment(price, installments) {
 function FieldGroup({ label, icon: Icon, error, children }) {
   return (
     <div>
-      <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-white/35 mb-1.5">
-        {Icon && <Icon size={11} />}
+      <label className="flex items-center gap-1.5 text-[11px] md:text-sm text-white mb-1.5">
+        {Icon && <Icon className="w-[11px] h-[11px] md:w-5 md:h-5" />}
         {label}
       </label>
+
       {children}
+
       {error && (
         <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-          <AlertCircle size={11} /> {error}
+          <AlertCircle className="w-[11px] h-[11px]" /> {error}
         </p>
       )}
     </div>
@@ -259,26 +261,32 @@ export default function InstallmentsPage() {
         </p>
 
         {/* Garantías */}
-        <div className="grid grid-cols-3 gap-2 mt-5">
+        <div className="grid grid-cols-3 gap-2 mt-5 md:gap-4 md:mt-6">
           {[
             { icon: Shield, label: '100% seguro' },
             { icon: Clock, label: 'Sin intereses' },
             { icon: CheckCircle, label: 'Sin trámites' },
           ].map(({ icon: Icon, label }) => (
-            <div key={label} className="bg-[#141414] border border-white/5 rounded-xl py-3 flex flex-col items-center gap-1.5">
-              <Icon size={16} className="text-[#CCFF00]" />
-              <span className="text-[10px] font-bold text-white/50 text-center leading-tight">{label}</span>
+            <div
+              key={label}
+              className="bg-[#141414] border border-white/5 rounded-xl py-3 md:py-4 flex flex-col items-center gap-1.5 md:gap-2"
+            >
+              <Icon className="w-4 h-4 md:w-6 md:h-6 text-[#CCFF00]" />
+
+              <span className="text-[10px] md:text-sm font-bold text-white/50 text-center leading-tight">
+                {label}
+              </span>
             </div>
           ))}
         </div>
       </div>
 
       {/* Form */}
-      <div className="px-4 pt-6 space-y-5">
+      <div className="px-4 pt-6 space-y-5 md:max-w-4xl mx-auto">
 
         {/* Sección: Datos personales */}
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-white/20 mb-3">
+          <p className="text-[11px] md:text-lg font-semibold text-white mb-3">
             1 · Tus datos
           </p>
           <div className="space-y-3">
@@ -320,7 +328,7 @@ export default function InstallmentsPage() {
 
         {/* Sección: Producto */}
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-white/20 mb-3">
+          <p className="text-[11px] md:text-lg font-semibold text-white mb-3">
             2 · Producto que deseas
           </p>
 
@@ -376,7 +384,7 @@ export default function InstallmentsPage() {
 
         {/* Sección: Cuotas */}
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-white/20 mb-3">
+          <p className="text-[11px] md:text-lg font-semibold text-white mb-3">
             3 · Elige tu plan de cuotas
           </p>
 
@@ -402,10 +410,10 @@ export default function InstallmentsPage() {
 
           {/* Número de cuotas */}
           <div className="mt-3">
-            <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-white/35 mb-2">
+            <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-white mb-2">
               <Calendar size={11} /> Número de cuotas
             </label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {INSTALLMENT_OPTIONS.map(n => {
                 const perQ = calcPerInstallment(effectivePrice, n)
                 return (
@@ -494,9 +502,9 @@ export default function InstallmentsPage() {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-full bg-[#CCFF00] text-black font-semibold py-4 rounded-2xl
+          className="w-full md:w-1/2 bg-[#CCFF00] text-black font-semibold py-4 rounded-full
             text-base active:scale-95 transition-all disabled:opacity-50
-            flex items-center justify-center gap-2 shadow-lg shadow-[#CCFF00]/10"
+            flex items-center justify-center justify-self-center gap-2 shadow-lg shadow-[#CCFF00]/10"
         >
           {loading
             ? <><Loader2 size={20} className="animate-spin" /> Enviando solicitud...</>
