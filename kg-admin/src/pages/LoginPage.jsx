@@ -24,7 +24,7 @@ export default function LoginPage() {
       {/* Logo */}
       <div className="mb-10 text-center fade-up">
         <img src="https://mlbdbkny4xg1.i.optimole.com/w:120/h:34/q:mauto/dpr:1.3/ig:avif/https://colecciones.grupo-gomez.com/wp-content/uploads/2024/12/kg-store-logo.png" alt="KG Store" className="h-12" />
-        <p className="text-white/30 text-sm mt-1">Panel de administración</p>
+        <p className="text-white text-sm mt-1">Panel de administración</p>
       </div>
 
       <div className="w-full max-w-sm space-y-3 fade-up">

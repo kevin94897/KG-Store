@@ -3,9 +3,9 @@ import { supabase } from '../utils/supabase'
 import { Plus, ChevronRight, ShoppingCart, X, Check, ChevronDown } from 'lucide-react'
 
 const STATUS_STYLE = {
-  pending:   'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+  pending: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
   confirmed: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  shipped:   'bg-purple-500/10 text-purple-400 border-purple-500/20',
+  shipped: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
   delivered: 'bg-green-500/10 text-green-400 border-green-500/20',
   cancelled: 'bg-red-500/10 text-red-400 border-red-500/20',
 }
@@ -39,7 +39,7 @@ function OrderCard({ order, onUpdate }) {
               {STATUS_LABEL[status]}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-white/30">
+          <div className="flex items-center gap-2 text-xs text-white">
             <span>{date}</span>
             {order.total && <span className="text-accent font-bold">S/{parseFloat(order.total).toFixed(2)}</span>}
           </div>
@@ -85,7 +85,7 @@ function NewOrderForm({ onSave, onCancel }) {
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
   return (
     <div className="card p-4 space-y-3">
-      <h3 className="text-sm font-black text-white">Nuevo pedido</h3>
+      <h3 className="text-sm font-semibold text-white">Nuevo pedido</h3>
       <div><label className="label">Nombre cliente *</label>
         <input className="input" placeholder="Juan Pérez" value={form.customer_name} onChange={e => set('customer_name', e.target.value)} /></div>
       <div><label className="label">WhatsApp</label>
@@ -139,7 +139,7 @@ export default function OrdersPage() {
       <div className="sticky top-0 bg-dark/95 backdrop-blur-xl z-10 px-4 pt-5 pb-3 border-b border-white/5">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h1 className="text-xl font-black text-white">Pedidos</h1>
+            <h1 className="text-xl font-semibold text-white">Pedidos</h1>
             <p className="text-xs text-white/25">{orders.length} en total</p>
           </div>
           <button
@@ -165,11 +165,11 @@ export default function OrdersPage() {
 
         {loading
           ? Array(4).fill(0).map((_, i) => (
-              <div key={i} className="card p-4 space-y-2">
-                <div className="skeleton h-4 w-1/2" />
-                <div className="skeleton h-3 w-1/4" />
-              </div>
-            ))
+            <div key={i} className="card p-4 space-y-2">
+              <div className="skeleton h-4 w-1/2" />
+              <div className="skeleton h-3 w-1/4" />
+            </div>
+          ))
           : filtered.length === 0
             ? (
               <div className="text-center py-16">

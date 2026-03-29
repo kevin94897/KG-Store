@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { thumbUrl, thumbFallback } from '../utils/thumbUrl'
 import { Link } from 'react-router-dom'
 import { supabase } from '../utils/supabase'
 import { useAuth } from '../context/AuthContext'
@@ -11,12 +12,12 @@ function StatCard({ label, value, icon: Icon, accent, sublabel }) {
   return (
     <div className="stat-card">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-white/30 font-semibold uppercase tracking-wider">{label}</span>
+        <span className="text-xs text-white font-semibold uppercase tracking-wider">{label}</span>
         <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${accent ? 'bg-accent/15' : 'bg-white/5'}`}>
           <Icon size={15} className={accent ? 'text-accent' : 'text-white/40'} />
         </div>
       </div>
-      <p className={`text-3xl font-black ${accent ? 'text-accent' : 'text-white'}`}>{value}</p>
+      <p className={`text-3xl font-semibold ${accent ? 'text-accent' : 'text-white'}`}>{value}</p>
       {sublabel && <p className="text-xs text-white/25 mt-0.5">{sublabel}</p>}
     </div>
   )
@@ -109,44 +110,44 @@ export default function DashboardPage() {
         <div className="space-y-2">
           {loading
             ? Array(4).fill(0).map((_, i) => (
-                <div key={i} className="card flex items-center gap-3 p-3">
-                  <div className="skeleton w-12 h-12 rounded-xl shrink-0" />
-                  <div className="flex-1 space-y-2">
-                    <div className="skeleton h-3.5 w-3/4" />
-                    <div className="skeleton h-3 w-1/3" />
+              <div key={i} className="card flex items-center gap-3 p-3">
+                <div className="skeleton w-12 h-12 rounded-xl shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="skeleton h-3.5 w-3/4" />
+                  <div className="skeleton h-3 w-1/3" />
+                </div>
+              </div>
+            ))
+            : recentProducts.map(p => (
+              <Link
+                key={p.id}
+                to={`/productos/${p.id}`}
+                className="card flex items-center gap-3 p-3 active:scale-[0.98] transition-all"
+              >
+                <div className="w-12 h-12 rounded-xl overflow-hidden bg-dark-600 shrink-0">
+                  {p.images?.[0]
+                    ? <img src={thumbUrl(p.images[0])} alt="" className="w-full h-full object-cover" loading="lazy" onError={thumbFallback(p.images[0])} />
+                    : <div className="w-full h-full flex items-center justify-center text-white/10">
+                      <Package size={20} />
+                    </div>
+                  }
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-white truncate">{p.name}</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className={`text-xs font-semibold ${STATUS_COLOR[p.status] || 'text-white/20'}`}>
+                      {STATUS_LABEL[p.status] || p.status}
+                    </span>
+                    {p.regular_price && (
+                      <span className="text-xs text-accent font-bold">
+                        S/{parseFloat(p.regular_price).toFixed(2)}
+                      </span>
+                    )}
                   </div>
                 </div>
-              ))
-            : recentProducts.map(p => (
-                <Link
-                  key={p.id}
-                  to={`/productos/${p.id}`}
-                  className="card flex items-center gap-3 p-3 active:scale-[0.98] transition-all"
-                >
-                  <div className="w-12 h-12 rounded-xl overflow-hidden bg-dark-600 shrink-0">
-                    {p.images?.[0]
-                      ? <img src={p.images[0]} alt="" className="w-full h-full object-cover" />
-                      : <div className="w-full h-full flex items-center justify-center text-white/10">
-                          <Package size={20} />
-                        </div>
-                    }
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">{p.name}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className={`text-xs font-semibold ${STATUS_COLOR[p.status] || 'text-white/20'}`}>
-                        {STATUS_LABEL[p.status] || p.status}
-                      </span>
-                      {p.regular_price && (
-                        <span className="text-xs text-accent font-bold">
-                          S/{parseFloat(p.regular_price).toFixed(2)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <ChevronRight size={15} className="text-white/15 shrink-0" />
-                </Link>
-              ))
+                <ChevronRight size={15} className="text-white/15 shrink-0" />
+              </Link>
+            ))
           }
         </div>
       </div>

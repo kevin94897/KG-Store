@@ -8,6 +8,7 @@ import ProductFormPage from './pages/ProductFormPage'
 import CategoriesPage from './pages/CategoriesPage'
 import OrdersPage from './pages/OrdersPage'
 import InstallmentRequestsPage from './pages/InstallmentRequestsPage'
+import MediaLibraryPage from './pages/MediaLibraryPage'
 
 function AppRoutes() {
   const { user, loading } = useAuth()
@@ -21,18 +22,21 @@ function AppRoutes() {
   if (!user) return <LoginPage />
 
   return (
-    <div>
-      <Routes>
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/productos" element={<ProductsPage />} />
-        <Route path="/productos/nuevo" element={<ProductFormPage />} />
-        <Route path="/productos/:id" element={<ProductFormPage />} />
-        <Route path="/categorias" element={<CategoriesPage />} />
-        <Route path="/pedidos" element={<OrdersPage />} />
-        <Route path="/cuotas" element={<InstallmentRequestsPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-      <BottomNav />
+    <div className="min-h-dvh bg-dark">
+      <div className="max-w-7xl mx-auto px-4 min-h-dvh relative">
+        <Routes>
+          <Route path="/"            element={<DashboardPage />} />
+          <Route path="/productos"   element={<ProductsPage />} />
+          <Route path="/productos/nuevo" element={<ProductFormPage />} />
+          <Route path="/productos/:id"   element={<ProductFormPage />} />
+          <Route path="/categorias"  element={<CategoriesPage />} />
+          <Route path="/pedidos"     element={<OrdersPage />} />
+          <Route path="/cuotas"      element={<InstallmentRequestsPage />} />
+          <Route path="/medios"      element={<MediaLibraryPage />} />
+          <Route path="*"            element={<Navigate to="/" replace />} />
+        </Routes>
+        <BottomNav />
+      </div>
     </div>
   )
 }

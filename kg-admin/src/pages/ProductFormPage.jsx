@@ -15,9 +15,9 @@ const EMPTY = {
 }
 
 const slugify = s => s.toLowerCase()
-  .replace(/[àáâãäå]/g,'a').replace(/[èéêë]/g,'e').replace(/[ìíîï]/g,'i')
-  .replace(/[òóôõö]/g,'o').replace(/[ùúûü]/g,'u').replace(/[ñ]/g,'n')
-  .replace(/[^\w\s-]/g,'').replace(/[\s_]+/g,'-').trim()
+  .replace(/[àáâãäå]/g, 'a').replace(/[èéêë]/g, 'e').replace(/[ìíîï]/g, 'i')
+  .replace(/[òóôõö]/g, 'o').replace(/[ùúûü]/g, 'u').replace(/[ñ]/g, 'n')
+  .replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-').trim()
 
 function Toggle({ label, sub, value, onChange }) {
   return (
@@ -25,7 +25,7 @@ function Toggle({ label, sub, value, onChange }) {
       className="w-full flex items-center justify-between px-4 py-3 bg-dark-700 rounded-xl border border-white/5">
       <div>
         <p className="text-sm text-white font-semibold">{label}</p>
-        {sub && <p className="text-xs text-white/30 mt-0.5">{sub}</p>}
+        {sub && <p className="text-xs text-white mt-0.5">{sub}</p>}
       </div>
       {value
         ? <ToggleRight size={26} className="text-accent shrink-0" />
@@ -40,14 +40,14 @@ export default function ProductFormPage() {
   const isEdit = Boolean(id) && id !== 'nuevo'
   const navigate = useNavigate()
 
-  const [form, setForm]         = useState(EMPTY)
+  const [form, setForm] = useState(EMPTY)
   const [categories, setCategories] = useState([])
-  const [section, setSection]   = useState('general')
-  const [loading, setLoading]   = useState(isEdit)
-  const [saving, setSaving]     = useState(false)
+  const [section, setSection] = useState('general')
+  const [loading, setLoading] = useState(isEdit)
+  const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
-  const [error, setError]       = useState('')
-  const [success, setSuccess]   = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
   // Banner cuando llegan imágenes compartidas
   const [sharedBanner, setSharedBanner] = useState(false)
 
@@ -172,7 +172,7 @@ export default function ProductFormPage() {
             className="w-9 h-9 bg-dark-600 border border-white/5 rounded-xl flex items-center justify-center text-white/50 active:text-white shrink-0">
             <ArrowLeft size={18} />
           </button>
-          <h1 className="flex-1 text-lg font-black text-white truncate">
+          <h1 className="flex-1 text-lg font-semibold text-white truncate">
             {isEdit ? (form.name || 'Editar') : 'Nuevo producto'}
           </h1>
           {isEdit && (
@@ -226,7 +226,7 @@ export default function ProductFormPage() {
             <div>
               <label className="label">Slug (URL)</label>
               <input className="input font-mono text-xs" placeholder="metal-gear-solid-v"
-                value={form.slug} onChange={e => set('slug', e.target.value.toLowerCase().replace(/\s+/g,'-'))} />
+                value={form.slug} onChange={e => set('slug', e.target.value.toLowerCase().replace(/\s+/g, '-'))} />
             </div>
             <div>
               <label className="label">SKU</label>
@@ -338,13 +338,15 @@ export default function ProductFormPage() {
 
       {/* Save bar */}
       <div className="fixed bottom-16 inset-x-0 px-4 py-3 bg-gradient-to-t from-dark to-transparent z-40">
-        <button className="btn-accent w-full py-4 text-base" onClick={handleSave} disabled={saving}>
-          {saving
-            ? <span className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-            : <Save size={18} />
-          }
-          {saving ? 'Guardando...' : isEdit ? 'Guardar cambios' : 'Crear producto'}
-        </button>
+        <div className="max-w-7xl mx-auto w-full">
+          <button className="btn-accent w-full py-4 text-base" onClick={handleSave} disabled={saving}>
+            {saving
+              ? <span className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+              : <Save size={18} />
+            }
+            {saving ? 'Guardando...' : isEdit ? 'Guardar cambios' : 'Crear producto'}
+          </button>
+        </div>
       </div>
     </div>
   )

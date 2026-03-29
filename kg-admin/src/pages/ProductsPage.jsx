@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../utils/supabase'
 import { Search, Plus, RefreshCw, Package, ChevronRight } from 'lucide-react'
 
+import { thumbUrl, thumbFallback } from '../utils/thumbUrl'
 const STATUS_STYLE = {
   published: 'bg-green-500/10 text-green-400 border-green-500/20',
   draft: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
@@ -18,7 +19,7 @@ function ProductRow({ product }) {
     >
       <div className="w-14 h-14 rounded-xl overflow-hidden bg-dark-600 shrink-0">
         {product.images?.[0]
-          ? <img src={product.images[0]} alt="" className="w-full h-full object-cover" />
+          ? <img src={thumbUrl(product.images[0])} alt="" className="w-full h-full object-cover" loading="lazy" onError={thumbFallback(product.images[0])} />
           : <div className="w-full h-full flex items-center justify-center"><Package size={22} className="text-white/10" /></div>
         }
       </div>
@@ -111,7 +112,7 @@ export default function ProductsPage() {
       <div className="sticky top-0 bg-dark/95 backdrop-blur-xl z-10 px-4 pt-4 pb-3 border-b border-white/5">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h1 className="text-xl font-black text-white">Productos</h1>
+            <h1 className="text-xl font-semibold text-white">Productos</h1>
             <p className="text-xs text-white/25">{products.length} resultados</p>
           </div>
           <div className="flex items-center gap-2">
@@ -163,7 +164,7 @@ export default function ProductsPage() {
             ? (
               <div className="text-center py-20">
                 <Package size={40} className="text-white/10 mx-auto mb-3" />
-                <p className="text-white/30 font-semibold">Sin productos</p>
+                <p className="text-white font-semibold">Sin productos</p>
               </div>
             )
             : products.map(p => <ProductRow key={p.id} product={p} />)

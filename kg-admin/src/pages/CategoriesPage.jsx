@@ -8,13 +8,13 @@ function Form({ initial, onSave, onCancel }) {
   const [desc, setDesc] = useState(initial?.description || '')
 
   const slugify = s => s.toLowerCase()
-    .replace(/[àáâãäå]/g,'a').replace(/[èéêë]/g,'e').replace(/[ìíîï]/g,'i')
-    .replace(/[òóôõö]/g,'o').replace(/[ùúûü]/g,'u').replace(/[ñ]/g,'n')
-    .replace(/[^\w\s-]/g,'').replace(/[\s_]+/g,'-').trim()
+    .replace(/[àáâãäå]/g, 'a').replace(/[èéêë]/g, 'e').replace(/[ìíîï]/g, 'i')
+    .replace(/[òóôõö]/g, 'o').replace(/[ùúûü]/g, 'u').replace(/[ñ]/g, 'n')
+    .replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-').trim()
 
   return (
     <div className="card p-4 space-y-3">
-      <h3 className="text-sm font-black text-white">{initial ? 'Editar categoría' : 'Nueva categoría'}</h3>
+      <h3 className="text-sm font-semibold text-white">{initial ? 'Editar categoría' : 'Nueva categoría'}</h3>
       <div>
         <label className="label">Nombre *</label>
         <input autoFocus className="input" placeholder="Ej: Figuras"
@@ -24,7 +24,7 @@ function Form({ initial, onSave, onCancel }) {
       <div>
         <label className="label">Slug</label>
         <input className="input font-mono text-xs" placeholder="figuras"
-          value={slug} onChange={e => setSlug(e.target.value.toLowerCase().replace(/\s+/g,'-'))} />
+          value={slug} onChange={e => setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))} />
       </div>
       <div>
         <label className="label">Descripción</label>
@@ -78,7 +78,7 @@ export default function CategoriesPage() {
       <div className="sticky top-0 bg-dark/95 backdrop-blur-xl z-10 px-4 pt-5 pb-3 border-b border-white/5">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-black text-white">Categorías</h1>
+            <h1 className="text-xl font-semibold text-white">Categorías</h1>
             <p className="text-xs text-white/25">{cats.length} categorías</p>
           </div>
           <button
@@ -108,14 +108,14 @@ export default function CategoriesPage() {
 
         {loading
           ? Array(3).fill(0).map((_, i) => (
-              <div key={i} className="card flex items-center gap-3 p-3">
-                <div className="skeleton w-10 h-10 rounded-xl" />
-                <div className="flex-1 space-y-2">
-                  <div className="skeleton h-4 w-1/2" />
-                  <div className="skeleton h-3 w-1/4" />
-                </div>
+            <div key={i} className="card flex items-center gap-3 p-3">
+              <div className="skeleton w-10 h-10 rounded-xl" />
+              <div className="flex-1 space-y-2">
+                <div className="skeleton h-4 w-1/2" />
+                <div className="skeleton h-3 w-1/4" />
               </div>
-            ))
+            </div>
+          ))
           : cats.length === 0 && !showForm
             ? (
               <div className="text-center py-16">
@@ -124,26 +124,26 @@ export default function CategoriesPage() {
               </div>
             )
             : cats.map(cat => (
-                <div key={cat.id} className="card flex items-center gap-3 px-4 py-3">
-                  <div className="w-10 h-10 bg-dark-600 rounded-xl flex items-center justify-center shrink-0">
-                    <Tag size={16} className="text-white/25" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white">{cat.name}</p>
-                    <p className="text-xs text-white/25 font-mono">{cat.slug}</p>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <button onClick={() => { setEditing(cat); setShowForm(true) }}
-                      className="w-8 h-8 bg-dark-600 rounded-lg flex items-center justify-center text-white/40 active:text-white">
-                      <Pencil size={14} />
-                    </button>
-                    <button onClick={() => handleDelete(cat)}
-                      className="w-8 h-8 bg-red-900/20 rounded-lg flex items-center justify-center text-red-500 active:bg-red-900/40">
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
+              <div key={cat.id} className="card flex items-center gap-3 px-4 py-3">
+                <div className="w-10 h-10 bg-dark-600 rounded-xl flex items-center justify-center shrink-0">
+                  <Tag size={16} className="text-white/25" />
                 </div>
-              ))
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-white">{cat.name}</p>
+                  <p className="text-xs text-white/25 font-mono">{cat.slug}</p>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <button onClick={() => { setEditing(cat); setShowForm(true) }}
+                    className="w-8 h-8 bg-dark-600 rounded-lg flex items-center justify-center text-white/40 active:text-white">
+                    <Pencil size={14} />
+                  </button>
+                  <button onClick={() => handleDelete(cat)}
+                    className="w-8 h-8 bg-red-900/20 rounded-lg flex items-center justify-center text-red-500 active:bg-red-900/40">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            ))
         }
       </div>
     </div>
