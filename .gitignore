@@ -1,7 +1,19 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+firebase-debug.log*
+
 # Node modules
 node_modules/
 
 # Vite build output
+dist/
+dist-ssr/
 kg-store/dist/
 kg-admin/dist/
 
@@ -15,32 +27,31 @@ kg-admin/dist/
 .DS_Store
 Thumbs.db
 
-# logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# IDEs
-.vscode/
+# IDEs and Editor directories
+.vscode/*
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo
+*.sw?
 *~
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
 
 # Supabase
 supabase/.temp/
 supabase/functions/.env.local
 .supabase/
 
-# Dependencies
-yarn.lock
-package-lock.json
+# Firebase
+.firebase/
 
 # Testing
 coverage/
 .nyc_output/
 
 # Misc
-.DS_Store
 *.pem
+.eslintcache
