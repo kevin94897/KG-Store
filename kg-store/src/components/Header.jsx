@@ -19,8 +19,8 @@ export default function Header({ cartCount = 0 }) {
 
   return (
     <>
-      <header className="fixed top-0 inset-x-0 z-50 bg-dark/90 backdrop-blur-xl border-b border-white/5 pt-safe">
-        <div className="flex items-center justify-between px-4 h-14 bg-black">
+      <header className="fixed top-0 inset-x-0 z-50 bg-black backdrop-blur-xl border-b border-white/5 pt-safe">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 h-14 bg-black">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <img src="https://mlbdbkny4xg1.i.optimole.com/w:120/h:34/q:mauto/dpr:1.3/ig:avif/https://colecciones.grupo-gomez.com/wp-content/uploads/2024/12/kg-store-logo.png" alt="KG Store" className="h-8" />
@@ -34,17 +34,17 @@ export default function Header({ cartCount = 0 }) {
             >
               <Search size={20} />
             </button>
-            <Link
+            {/* <Link
               to="/carrito"
               className="relative w-9 h-9 flex items-center justify-center rounded-full text-white/60 active:text-white active:bg-white/10"
             >
               <ShoppingBag size={20} />
               {cartCount > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 bg-accent text-black text-[9px] font-black rounded-full flex items-center justify-center">
+                <span className="absolute top-1 right-1 w-4 h-4 bg-accent text-black text-[9px] font-semibold rounded-full flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
-            </Link>
+            </Link> */}
             <button
               onClick={() => setMenuOpen(p => !p)}
               className="w-9 h-9 flex items-center justify-center rounded-full text-white/60 active:text-white active:bg-white/10"
@@ -71,34 +71,36 @@ export default function Header({ cartCount = 0 }) {
       {/* Fullscreen menu */}
       {menuOpen && (
         <div className="fixed inset-0 z-40 bg-dark/98 backdrop-blur-xl flex flex-col justify-center px-8 pt-safe fade-in">
-          <button
-            onClick={() => setMenuOpen(false)}
-            className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-white"
-          >
-            <X size={22} />
-          </button>
-          <nav className="space-y-2">
-            {[
-              { to: '/', label: 'Inicio' },
-              { to: '/tienda', label: 'Toda la tienda' },
-              { to: '/tienda?cat=figuras', label: 'Figuras' },
-              { to: '/tienda?cat=edicion-coleccionista', label: 'Ediciones Coleccionistas' },
-              { to: '/tienda?cat=coleccionables', label: 'Coleccionables' },
-            ].map(item => (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setMenuOpen(false)}
-                className="block text-4xl font-black text-white/80 active:text-accent py-2 transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="mt-12 border-t border-white/10 pt-8">
-            <p className="text-white/30 text-sm">
-              Figuras, ediciones de PS4/PS5 y coleccionables para tu colección.
-            </p>
+          <div className="max-w-7xl mx-auto">
+            <button
+              onClick={() => setMenuOpen(false)}
+              className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-white"
+            >
+              <X size={22} />
+            </button>
+            <nav className="space-y-2">
+              {[
+                { to: '/', label: 'Inicio' },
+                { to: '/tienda', label: 'Toda la tienda' },
+                { to: '/tienda?cat=figuras', label: 'Figuras' },
+                { to: '/tienda?cat=edicion-coleccionista', label: 'Ediciones Coleccionistas' },
+                { to: '/tienda?cat=coleccionables', label: 'Coleccionables' },
+              ].map(item => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setMenuOpen(false)}
+                  className="block text-2xl md:text-4xl font-semibold text-white/80 active:text-accent py-2 transition-colors"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+            <div className="mt-12 border-t border-white/10 pt-8">
+              <p className="text-white text-sm">
+                Figuras, ediciones de PS4/PS5 y coleccionables para tu colección.
+              </p>
+            </div>
           </div>
         </div>
       )}

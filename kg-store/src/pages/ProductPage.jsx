@@ -1,15 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { useProduct } from '../hooks/useProducts'
+import { useProduct, useProducts } from '../hooks/useProducts'
+import ProductSlider from '../components/ProductSlider'
 import { ArrowLeft, Truck, Share2, ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react'
 import useSeo from '../hooks/useSeo'
 
 // ─── Fullscreen Modal con swipe táctil ───────────────────────
 function FullscreenGallery({ images, initialIndex, onClose }) {
-  const [current, setCurrent]   = useState(initialIndex)
-  const touchStartX             = useRef(null)
-  const touchStartY             = useRef(null)
-  const isDragging              = useRef(false)
+  const [current, setCurrent] = useState(initialIndex)
+  const touchStartX = useRef(null)
+  const touchStartY = useRef(null)
+  const isDragging = useRef(false)
   const [dragOffset, setDragOffset] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
 
@@ -25,9 +26,9 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
   // Teclado desktop
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === 'Escape')      onClose()
-      if (e.key === 'ArrowLeft')   prev()
-      if (e.key === 'ArrowRight')  next()
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowLeft') prev()
+      if (e.key === 'ArrowRight') next()
     }
     window.addEventListener('keydown', onKey)
     // Bloquear scroll del body
@@ -42,7 +43,7 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
   const onTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX
     touchStartY.current = e.touches[0].clientY
-    isDragging.current  = false
+    isDragging.current = false
   }
 
   const onTouchMove = (e) => {
@@ -70,12 +71,12 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
 
     touchStartX.current = null
     touchStartY.current = null
-    isDragging.current  = false
+    isDragging.current = false
   }
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black flex flex-col"
+      className="fixed inset-0 z-[60] bg-black flex flex-col"
       style={{
         height: '100dvh',
         paddingTop: 'env(safe-area-inset-top, 0px)',
@@ -148,9 +149,8 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
               <button
                 key={i}
                 onClick={() => setCurrent(i)}
-                className={`transition-all rounded-full ${
-                  i === current ? 'w-5 h-2 bg-white' : 'w-2 h-2 bg-white/30'
-                }`}
+                className={`transition-all rounded-full ${i === current ? 'w-5 h-2 bg-white' : 'w-2 h-2 bg-white/30'
+                  }`}
               />
             ))}
           </div>
@@ -180,9 +180,9 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
 
 // ─── Galería principal del producto ──────────────────────────
 function ImageGallery({ images }) {
-  const [current, setCurrent]       = useState(0)
+  const [current, setCurrent] = useState(0)
   const [fullscreen, setFullscreen] = useState(false)
-  const touchStartX                 = useRef(null)
+  const touchStartX = useRef(null)
 
   if (!images?.length) return (
     <div className="aspect-square bg-[#1C1C1C] flex items-center justify-center">
@@ -194,7 +194,7 @@ function ImageGallery({ images }) {
   const next = () => setCurrent(p => (p + 1) % images.length)
 
   const onTouchStart = (e) => { touchStartX.current = e.touches[0].clientX }
-  const onTouchEnd   = (e) => {
+  const onTouchEnd = (e) => {
     if (!touchStartX.current) return
     const dx = e.changedTouches[0].clientX - touchStartX.current
     if (dx < -50) next()
@@ -207,7 +207,7 @@ function ImageGallery({ images }) {
       <div className="relative" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         {/* Imagen principal */}
         <div
-          className="aspect-square bg-[#1C1C1C] overflow-hidden cursor-zoom-in"
+          className="aspect-square bg-[#1C1C1C] overflow-hidden cursor-zoom-in md:rounded-2xl"
           onClick={() => setFullscreen(true)}
         >
           <img
@@ -249,9 +249,8 @@ function ImageGallery({ images }) {
               <button
                 key={i}
                 onClick={() => setCurrent(i)}
-                className={`transition-all rounded-full ${
-                  i === current ? 'w-4 h-1.5 bg-accent' : 'w-1.5 h-1.5 bg-white/40'
-                }`}
+                className={`transition-all rounded-full ${i === current ? 'w-4 h-1.5 bg-accent' : 'w-1.5 h-1.5 bg-white/40'
+                  }`}
               />
             ))}
           </div>
@@ -296,17 +295,36 @@ function ImageGallery({ images }) {
   )
 }
 
+// ─── Productos Relacionados ───────────────────────────────────
+function RelatedProducts({ categorySlug, currentProductId }) {
+  const { products, loading } = useProducts({ category: categorySlug, limit: 12 })
+  // Filtramos el producto actual
+  const related = products.filter(p => p.id !== currentProductId)
+
+  if (!loading && related.length === 0) return null
+
+  return (
+    <section className="mt-4 md:mt-8 border-t border-white/5 pt-8 mb-8 pb-4">
+      <div className="px-4 mb-5">
+        <h2 className="text-xl font-bold text-white mb-1">Productos similares</h2>
+        <p className="text-white/40 text-sm">Más artículos que te podrían interesar</p>
+      </div>
+      <ProductSlider products={related} loading={loading} />
+    </section>
+  )
+}
+
 // ─── Página de producto ───────────────────────────────────────
 export default function ProductPage() {
-  const { slug }            = useParams()
+  const { slug } = useParams()
   const { product, loading } = useProduct(slug)
 
   useSeo({
-    title:       product ? `${product.name} | KG Store` : 'KG Store | Producto',
+    title: product ? `${product.name} | KG Store` : 'KG Store | Producto',
     description: product
       ? (product.short_description || `Compra ${product.name} en cuotas`)
       : 'Detalle del producto en KG Store',
-    url:   `https://tu-dominio.com/producto/${slug}`,
+    url: `https://tu-dominio.com/producto/${slug}`,
     image: product?.images?.[0] || 'https://tu-dominio.com/og-image.jpg',
   })
 
@@ -322,7 +340,7 @@ export default function ProductPage() {
   }
 
   if (loading) return (
-    <div className="pt-14 min-h-dvh">
+    <div className="max-w-7xl mx-auto w-full min-h-dvh relative pt-14">
       <div className="skeleton aspect-square" />
       <div className="p-4 space-y-3">
         <div className="skeleton h-6 w-3/4 rounded" />
@@ -334,7 +352,7 @@ export default function ProductPage() {
   )
 
   if (!product) return (
-    <div className="pt-14 flex items-center justify-center min-h-dvh">
+    <div className="max-w-7xl mx-auto w-full min-h-dvh relative pt-14 flex items-center justify-center">
       <div className="text-center">
         <p className="text-white/40">Producto no encontrado</p>
         <Link to="/tienda" className="text-accent text-sm mt-2 block">← Volver</Link>
@@ -342,132 +360,175 @@ export default function ProductPage() {
     </div>
   )
 
-  const hasSale  = product.sale_price && product.sale_price < product.regular_price
+  const hasSale = product.sale_price && product.sale_price < product.regular_price
   const discount = hasSale
     ? Math.round((1 - product.sale_price / product.regular_price) * 100)
     : 0
 
   return (
-    <div className="pt-14 pb-32 min-h-dvh fade-up">
-      {/* Botón volver */}
-      <div className="absolute top-[56px] left-0 z-10 p-3">
+    <div className="max-w-7xl mx-auto w-full min-h-dvh relative pt-14 pb-32 fade-up">
+      {/* Botón volver solo móvil */}
+      <div className="p-4 md:hidden">
         <Link
           to="/tienda"
-          className="w-9 h-9 rounded-full flex items-center justify-center text-white border border-white/10"
-          style={{ background: 'rgba(14,14,14,0.80)' }}
+          className="inline-flex items-center gap-2 text-white hover:underline text-sm font-semibold active:text-accent transition-colors"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={16} />
+          Volver a la tienda
         </Link>
       </div>
 
-      {/* Galería */}
-      <ImageGallery images={product.images} />
+      {/* Banner Promocional Arriba */}
+      <div className="px-4 pt-4 md:pt-6 pb-2 md:block hidden">
+        <div className="bg-accent/10 border border-accent/20 rounded-2xl p-4 flex items-center justify-between text-accent">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">⚡</span>
+            <div>
+              <p className="text-sm font-bold">¡Explora nuestras novedades!</p>
+              <p className="text-xs text-accent/70 mt-0.5">Envíos seguros a todo el país</p>
+            </div>
+          </div>
+          <Link to="/tienda" className="hidden sm:flex shrink-0 px-4 py-2 bg-accent text-black rounded-xl text-xs font-bold active:scale-95 transition-all">
+            Ver tienda
+          </Link>
+        </div>
+      </div>
 
-      {/* Contenido */}
-      <div className="px-4 pt-5">
-        {/* Categoría + compartir */}
-        <div className="flex items-center justify-between mb-2">
-          {product.categories && (
-            <span className="text-accent text-xs font-bold uppercase tracking-widest">
-              {product.categories.name}
-            </span>
-          )}
-          {typeof navigator !== 'undefined' && navigator.share && (
-            <button onClick={handleShare} className="text-white/40 active:text-white transition-colors p-1">
-              <Share2 size={18} />
-            </button>
-          )}
+      {/* Grid Content */}
+      <div className="md:grid md:grid-cols-2 md:gap-10 md:px-4 md:pt-4">
+
+        {/* Left Column: Image Gallery */}
+        <div className="md:sticky md:top-24 md:mb-10">
+          <ImageGallery images={product.images} />
         </div>
 
-        {/* Nombre */}
-        <h1 className="text-2xl font-black text-white leading-tight mb-3">
-          {product.name}
-        </h1>
-
-        {/* Precio */}
-        <div className="flex items-center gap-3 mb-4">
-          {hasSale ? (
-            <>
-              <span className="text-3xl font-black text-accent">
-                S/{product.sale_price.toFixed(2)}
+        {/* Right Column: Content */}
+        <div className="px-4 pt-5 md:pt-0 pb-10">
+          {/* Categoría + compartir */}
+          <div className="flex items-center justify-between mb-2">
+            {product.categories && (
+              <span className="text-accent text-xs font-bold uppercase tracking-widest">
+                {product.categories.name}
               </span>
-              <div>
-                <span className="text-white/30 text-sm line-through block">
-                  S/{product.regular_price.toFixed(2)}
-                </span>
-                <span className="bg-accent/20 text-accent text-xs font-bold px-2 py-0.5 rounded-md">
-                  -{discount}% OFF
-                </span>
-              </div>
-            </>
-          ) : product.regular_price ? (
-            <span className="text-3xl font-black text-white">
-              S/{product.regular_price.toFixed(2)}
-            </span>
-          ) : (
-            <span className="text-xl font-bold text-white/50">Consultar precio</span>
-          )}
-        </div>
+            )}
+            {typeof navigator !== 'undefined' && navigator.share && (
+              <button onClick={handleShare} className="text-white/40 active:text-white transition-colors p-1 md:hover:bg-white/10 md:rounded-full">
+                <Share2 size={18} />
+              </button>
+            )}
+          </div>
 
-        {/* Stock */}
-        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-4 border
+          {/* Nombre */}
+          <h1 className="text-2xl font-semibold text-white leading-tight mb-3">
+            {product.name}
+          </h1>
+
+          {/* Precio */}
+          <div className="flex items-center gap-3 mb-4">
+            {hasSale ? (
+              <>
+                <span className="text-3xl font-semibold text-accent">
+                  S/{product.sale_price.toFixed(2)}
+                </span>
+                <div>
+                  <span className="text-white text-sm line-through block">
+                    S/{product.regular_price.toFixed(2)}
+                  </span>
+                  <span className="bg-accent/20 text-accent text-xs font-bold px-2 py-0.5 rounded-md">
+                    -{discount}% OFF
+                  </span>
+                </div>
+              </>
+            ) : product.regular_price ? (
+              <span className="text-3xl font-semibold text-white">
+                S/{product.regular_price.toFixed(2)}
+              </span>
+            ) : (
+              <span className="text-xl font-bold text-white/50">Consultar precio</span>
+            )}
+          </div>
+
+          {/* Stock */}
+          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-4 border
           ${product.in_stock
-            ? 'bg-green-500/10 text-green-400 border-green-500/20'
-            : 'bg-red-500/10 text-red-400 border-red-500/20'
-          }`}>
-          <div className={`w-2 h-2 rounded-full ${product.in_stock ? 'bg-green-400' : 'bg-red-400'}`} />
-          {product.in_stock ? 'En stock' : 'Agotado'}
-        </div>
+              ? 'bg-green-500/10 text-green-400 border-green-500/20'
+              : 'bg-red-500/10 text-red-400 border-red-500/20'
+            }`}>
+            <div className={`w-2 h-2 rounded-full ${product.in_stock ? 'bg-green-400' : 'bg-red-400'}`} />
+            {product.in_stock ? 'En stock' : 'Agotado'}
+          </div>
 
-        {/* Envío gratis */}
-        <div className="flex items-center gap-2 text-accent text-sm font-semibold mb-5">
-          <Truck size={16} />
-          Envío gratis a todo el país
-        </div>
+          {/* Envío gratis */}
+          <div className="flex items-center gap-2 text-accent text-sm font-semibold mb-5">
+            <Truck size={16} />
+            Envío gratis a todo el país
+          </div>
 
-        {/* Descripción */}
-        {product.short_description && (
-          <div className="bg-[#1C1C1C] rounded-2xl p-4 mb-4">
-            <p className="text-white/70 text-sm leading-relaxed">
-              {product.short_description}
+          {/* Descripción */}
+          {product.short_description && (
+            <div className="bg-[#1C1C1C] rounded-2xl p-4 mb-4">
+              <p className="text-white/70 text-sm leading-relaxed">
+                {product.short_description}
+              </p>
+            </div>
+          )}
+
+          {/* Tags */}
+          {product.tags?.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {product.tags.map(tag => (
+                <span key={tag} className="tag-pill">{tag}</span>
+              ))}
+            </div>
+          )}
+
+          {/* Banner cuotas */}
+          <Link
+            to="/cuotas"
+            className="block bg-[#1C1C1C] border border-white/5 rounded-2xl p-4 active:border-accent/30 transition-colors"
+          >
+            <p className="text-white font-bold text-sm mb-1">
+              ¿No puedes pagar todo ahora? 💳
             </p>
-          </div>
-        )}
+            <p className="text-white/40 text-xs">
+              Cuotas semanales o mensuales sin intereses → <span className="text-accent">Ver opciones</span>
+            </p>
+          </Link>
 
-        {/* Tags */}
-        {product.tags?.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
-            {product.tags.map(tag => (
-              <span key={tag} className="tag-pill">{tag}</span>
-            ))}
+          {/* Desktop CTA */}
+          <div className="hidden md:block mt-8">
+            <button
+              onClick={handleWhatsApp}
+              className="w-full btn-accent bg-[#25D366] text-white text-base py-4 flex items-center justify-center gap-2 rounded-full md:hover:brightness-110 md:shadow-lg md:shadow-green-500/20 transition-all font-semibold"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>
+              Consultar por WhatsApp
+            </button>
           </div>
-        )}
-
-        {/* Banner cuotas */}
-        <Link
-          to="/cuotas"
-          className="block bg-[#1C1C1C] border border-white/5 rounded-2xl p-4 mb-6 active:border-accent/30 transition-colors"
-        >
-          <p className="text-white font-bold text-sm mb-1">
-            ¿No puedes pagar todo ahora? 💳
-          </p>
-          <p className="text-white/40 text-xs">
-            Cuotas semanales o mensuales sin intereses → <span className="text-accent">Ver opciones</span>
-          </p>
-        </Link>
+        </div>
       </div>
 
-      {/* CTA fijo en la parte inferior */}
+      {/* Slider de Productos Relacionados */}
+      {product.categories && (
+        <RelatedProducts
+          categorySlug={product.categories.slug}
+          currentProductId={product.id}
+        />
+      )}
+
+      {/* CTA fijo en la parte inferior para Mobile */}
       <div
-        className="fixed bottom-0 inset-x-0 px-4 py-3 pb-safe z-40"
+        className="fixed bottom-0 inset-x-0 px-4 py-3 pb-safe z-40 md:hidden"
         style={{ background: 'linear-gradient(to top, #0E0E0E 60%, transparent)' }}
       >
         <button
           onClick={handleWhatsApp}
-          className="btn-accent bg-[#25D366] text-white text-base py-4"
+          className="btn-accent bg-[#25D366] text-white text-base py-4 flex items-center justify-center gap-2 w-full font-semibold"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
           </svg>
           Consultar por WhatsApp
         </button>

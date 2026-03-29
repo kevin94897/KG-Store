@@ -9,15 +9,17 @@ import InstallmentsPage from './pages/InstallmentsPage'
 export default function App() {
   return (
     <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/tienda" element={<StorePage />} />
-        <Route path="/producto/:slug" element={<ProductPage />} />
-        <Route path="/cuotas" element={<InstallmentsPage />} />
-        <Route path="*" element={<StorePage />} />
-      </Routes>
-      {/* <FloatingWhatsApp /> */}
+      <div className="min-h-dvh bg-dark">
+        <Header />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/tienda" element={<StorePage />} />
+          <Route path="/producto/:slug" element={<ProductPage />} />
+          <Route path="/cuotas" element={<InstallmentsPage />} />
+          <Route path="*" element={<StorePage />} />
+        </Routes>
+        {/* <FloatingWhatsApp /> */}
+      </div>
     </BrowserRouter>
   )
 }

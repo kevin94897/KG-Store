@@ -189,12 +189,12 @@ export default function InstallmentsPage() {
   // ─── Vista de éxito ──────────────────────────────────────────
   if (submitted) {
     return (
-      <div className="min-h-dvh bg-[#0E0E0E] flex flex-col items-center justify-center px-5 pt-14 pb-10">
+      <div className="max-w-7xl mx-auto w-full min-h-dvh relative bg-[#0E0E0E] flex flex-col items-center justify-center px-5 pt-14 pb-10">
         <div className="w-full max-w-sm text-center">
           <div className="w-20 h-20 bg-[#CCFF00]/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle size={40} className="text-[#CCFF00]" />
           </div>
-          <h1 className="text-2xl font-black text-white mb-3">¡Solicitud enviada!</h1>
+          <h1 className="text-2xl font-semibold text-white mb-3">¡Solicitud enviada!</h1>
           <p className="text-white/50 text-sm leading-relaxed mb-8">
             Recibimos tu solicitud de pago en cuotas. Nos contactaremos contigo a la brevedad
             por <strong className="text-white">WhatsApp o correo</strong> para coordinar los detalles.
@@ -202,7 +202,7 @@ export default function InstallmentsPage() {
 
           {/* Resumen */}
           <div className="bg-[#141414] border border-white/5 rounded-2xl p-4 text-left mb-8">
-            <p className="text-xs font-bold uppercase tracking-widest text-white/30 mb-3">Tu solicitud</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-white mb-3">Tu solicitud</p>
             <InfoBadge icon={Package} label="Producto" value={selectedProduct?.name || '—'} />
             {effectivePrice && (
               <InfoBadge icon={CreditCard} label="Precio total" value={`S/${parseFloat(effectivePrice).toFixed(2)}`} accent />
@@ -221,7 +221,7 @@ export default function InstallmentsPage() {
               className="flex items-center justify-center gap-2 w-full bg-[#25D366] text-white font-bold py-4 rounded-2xl active:scale-95 transition-all text-sm"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
               </svg>
               Escribir por WhatsApp
             </a>
@@ -239,19 +239,19 @@ export default function InstallmentsPage() {
 
   // ─── Formulario ──────────────────────────────────────────────
   return (
-    <div className="min-h-dvh bg-[#0E0E0E] pt-14 pb-12">
+    <div className="max-w-7xl mx-auto w-full min-h-dvh relative bg-[#0E0E0E] pt-14 pb-12">
       {/* Hero */}
       <div className="px-4 pt-6 pb-5 border-b border-white/5">
-      <div>
-<Link to="/" className="inline-flex items-center gap-1.5 text-white/30 text-sm mb-4 active:text-white transition-colors">
-          <ArrowLeft size={15} /> Volver
-        </Link>
-      </div>  
+        <div>
+          <Link to="/" className="inline-flex items-center gap-1.5 text-white text-sm mb-4 active:text-white transition-colors">
+            <ArrowLeft size={15} /> Volver
+          </Link>
+        </div>
         <div className="inline-flex items-center gap-2 bg-[#CCFF00]/10 border border-[#CCFF00]/20 rounded-full px-3 py-1 mb-3">
           <CreditCard size={11} className="text-[#CCFF00]" />
           <span className="text-[#CCFF00] text-xs font-bold uppercase tracking-widest">Pago en cuotas</span>
         </div>
-        <h1 className="text-2xl font-black text-white leading-tight mb-2">
+        <h1 className="text-2xl font-semibold text-white leading-tight mb-2">
           ¿No puedes pagar<br />todo de una vez?
         </h1>
         <p className="text-white/40 text-sm leading-relaxed">
@@ -278,7 +278,7 @@ export default function InstallmentsPage() {
 
         {/* Sección: Datos personales */}
         <div>
-          <p className="text-[11px] font-black uppercase tracking-widest text-white/20 mb-3">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-white/20 mb-3">
             1 · Tus datos
           </p>
           <div className="space-y-3">
@@ -320,7 +320,7 @@ export default function InstallmentsPage() {
 
         {/* Sección: Producto */}
         <div>
-          <p className="text-[11px] font-black uppercase tracking-widest text-white/20 mb-3">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-white/20 mb-3">
             2 · Producto que deseas
           </p>
 
@@ -357,7 +357,7 @@ export default function InstallmentsPage() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-white truncate">{selectedProduct.name}</p>
                 {effectivePrice && (
-                  <p className="text-[#CCFF00] font-black text-base mt-0.5">
+                  <p className="text-[#CCFF00] font-semibold text-base mt-0.5">
                     S/{parseFloat(effectivePrice).toFixed(2)}
                   </p>
                 )}
@@ -376,7 +376,7 @@ export default function InstallmentsPage() {
 
         {/* Sección: Cuotas */}
         <div>
-          <p className="text-[11px] font-black uppercase tracking-widest text-white/20 mb-3">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-white/20 mb-3">
             3 · Elige tu plan de cuotas
           </p>
 
@@ -419,10 +419,10 @@ export default function InstallmentsPage() {
                         : 'bg-[#191919] border-white/8'
                       }`}
                   >
-                    <span className={`text-lg font-black leading-none ${form.installments === n ? 'text-[#CCFF00]' : 'text-white'}`}>
+                    <span className={`text-lg font-semibold leading-none ${form.installments === n ? 'text-[#CCFF00]' : 'text-white'}`}>
                       {n}
                     </span>
-                    <span className={`text-[12px] uppercase font-semibold mt-0.5 ${form.installments === n ? 'text-[#CCFF00]/70' : 'text-white/30'}`}>
+                    <span className={`text-[12px] uppercase font-semibold mt-0.5 ${form.installments === n ? 'text-[#CCFF00]/70' : 'text-white'}`}>
                       cuotas
                     </span>
                     {perQ && (
@@ -494,7 +494,7 @@ export default function InstallmentsPage() {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-full bg-[#CCFF00] text-black font-black py-4 rounded-2xl
+          className="w-full bg-[#CCFF00] text-black font-semibold py-4 rounded-2xl
             text-base active:scale-95 transition-all disabled:opacity-50
             flex items-center justify-center gap-2 shadow-lg shadow-[#CCFF00]/10"
         >
@@ -512,7 +512,7 @@ export default function InstallmentsPage() {
           className="flex items-center justify-center gap-2 w-full text-white/40 text-sm py-2 active:text-white transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
           </svg>
           O escríbenos directamente por WhatsApp
         </a>

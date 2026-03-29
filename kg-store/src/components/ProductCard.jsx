@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Truck } from 'lucide-react'
+import { mediumUrl, mediumFallback } from '../utils/thumbUrl'
 
 function PriceBadge({ regular, sale }) {
   const discount = sale && regular ? Math.round((1 - sale / regular) * 100) : 0
@@ -8,7 +9,7 @@ function PriceBadge({ regular, sale }) {
       {sale ? (
         <>
           <span className="text-accent font-bold text-base">S/{sale.toFixed(2)}</span>
-          <span className="text-white/30 text-sm line-through">S/{regular.toFixed(2)}</span>
+          <span className="text-white text-sm line-through">S/{regular.toFixed(2)}</span>
         </>
       ) : (
         <span className="text-white font-bold text-base">
@@ -31,15 +32,16 @@ export default function ProductCard({ product }) {
       <div className="relative aspect-square overflow-hidden bg-dark-700">
         {mainImage ? (
           <img
-            src={mainImage}
+            src={mediumUrl(mainImage)}
             alt={product.name}
             className="w-full h-full object-cover group-active:scale-105 transition-transform duration-300"
             loading="lazy"
+            onError={mediumFallback(mainImage)}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-white/10">
             <svg width="48" height="48" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
             </svg>
           </div>
         )}
