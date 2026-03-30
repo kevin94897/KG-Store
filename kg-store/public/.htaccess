@@ -1,0 +1,14 @@
+Options -MultiViews
+RewriteEngine On
+RewriteBase /
+
+# Servir archivos y directorios reales sin modificación
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Rutas de producto: pasar por el proxy PHP para detectar bots y servir OG tags
+RewriteRule ^producto/([^/]+)/?$ og-proxy.php?slug=$1 [QSA,L]
+
+# Todo lo demás: SPA React (index.html)
+RewriteRule ^ index.html [L]
