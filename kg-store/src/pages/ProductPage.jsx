@@ -324,8 +324,8 @@ export default function ProductPage() {
     description: product
       ? (product.short_description || `Compra ${product.name} en cuotas`)
       : 'Detalle del producto en KG Store',
-    url: `https://tu-dominio.com/producto/${slug}`,
-    image: product?.images?.[0] || 'https://tu-dominio.com/og-image.jpg',
+    url: `https://colecciones.grupo-gomez.com/producto/${slug}`,
+    image: product?.images?.[0] || 'https://colecciones.grupo-gomez.com/og-image.jpg',
   })
 
   const handleWhatsApp = () => {
