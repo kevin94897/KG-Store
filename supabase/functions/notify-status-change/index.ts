@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')!
-const FROM_EMAIL = 'KG Store <no-reply@grupo-gomez.com>'
+const FROM_EMAIL = 'KG Store <no-reply@colecciones.grupo-gomez.com>'
 
 const STATUS_LABEL: Record<string, { label: string; emoji: string; color: string; desc: string }> = {
   confirmed: {
@@ -16,11 +16,11 @@ const STATUS_LABEL: Record<string, { label: string; emoji: string; color: string
     color: '#3b82f6',
     desc: '¡Tu reserva fue completada con éxito! Gracias por tu compra en KG Store.',
   },
-  cancelled: {
-    label: 'Cancelada',
+  rejected: {
+    label: 'Rechazada',
     emoji: '❌',
     color: '#ef4444',
-    desc: 'Lamentablemente tu reserva fue cancelada. Contáctanos si crees que es un error.',
+    desc: 'Lamentablemente tu reserva fue rechazada. Contáctanos si crees que es un error.',
   },
 }
 
@@ -64,7 +64,7 @@ serve(async (req) => {
 
     <div style="background:#1c1c1c;border-radius:24px;padding:32px;border:1px solid rgba(255,255,255,0.06);">
       <p style="color:${cfg.color};font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin:0 0 8px;">
-        ${cfg.emoji} Actualización de reserva
+        Actualización de reserva
       </p>
       <h1 style="color:#ffffff;font-size:22px;font-weight:700;margin:0 0 8px;">
         Hola, ${user_name || 'estimado cliente'}
@@ -77,7 +77,7 @@ serve(async (req) => {
       <div style="border:1px solid rgba(255,255,255,0.06);border-radius:16px;overflow:hidden;margin-bottom:24px;">
         <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">
           <p style="color:rgba(255,255,255,0.35);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0 0 4px;">Código de reserva</p>
-          <p style="color:#c8a96e;font-size:20px;font-weight:700;letter-spacing:4px;font-family:monospace;margin:0;">${reservation_code}</p>
+          <p style="color:#CCFF00;font-size:20px;font-weight:700;letter-spacing:4px;font-family:monospace;margin:0;">${reservation_code}</p>
         </div>
         <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">
           <p style="color:rgba(255,255,255,0.35);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0 0 4px;">Producto</p>
@@ -86,19 +86,19 @@ serve(async (req) => {
         <div style="padding:14px 20px;">
           <p style="color:rgba(255,255,255,0.35);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px;">Estado</p>
           <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,0.1);color:${cfg.color};border:1px solid;border-color:${cfg.color}33;border-radius:100px;padding:4px 12px;font-size:12px;font-weight:700;">
-            ${cfg.emoji} ${cfg.label}
+            ${cfg.label}
           </span>
         </div>
       </div>
 
       <a href="https://colecciones.grupo-gomez.com/mis-reservas"
-         style="display:block;background:#c8a96e;color:#000000;text-decoration:none;text-align:center;padding:16px;border-radius:100px;font-weight:700;font-size:15px;margin-bottom:16px;">
+         style="display:block;background:#CCFF00;color:#000000;text-decoration:none;text-align:center;padding:16px;border-radius:100px;font-weight:700;font-size:15px;margin-bottom:16px;">
         Ver mis reservas →
       </a>
 
       <p style="color:rgba(255,255,255,0.25);font-size:13px;text-align:center;margin:0;">
         ¿Tienes dudas? Escríbenos por
-        <a href="https://wa.me/51947841355" style="color:#c8a96e;text-decoration:none;">WhatsApp</a>
+        <a href="https://wa.me/51947841355" style="color:#CCFF00;text-decoration:none;">WhatsApp</a>
       </p>
     </div>
 

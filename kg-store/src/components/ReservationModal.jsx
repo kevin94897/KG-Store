@@ -61,8 +61,37 @@ export default function ReservationModal({ product, onClose }) {
     setError('')
 
     try {
-      // 1. Upload proof to Supabase Storage
-      const ext = file.name.split('.').pop()
+      // ── Anti-spam: checks ANTES de subir el archivo ──────────
+
+      // 1. Reserva duplicada para este producto
+      const { data: existing } = await supabase
+        .from('reservations')
+        .select('status')
+        .eq('user_id', user.id)
+        .eq('product_id', product.id)
+        .in('status', ['pending', 'confirmed'])
+        .limit(1)
+
+      if (existing?.length > 0) {
+        const label = existing[0].status === 'confirmed' ? 'confirmada' : 'pendiente'
+        throw new Error(`Ya tienes una reserva ${label} para este producto.`)
+      }
+
+      // 2. Límite: máximo 3 reservas pendientes en total
+      const { count } = await supabase
+        .from('reservations')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('status', 'pending')
+
+      if (count >= 3) {
+        throw new Error('Tienes 3 reservas pendientes. Espera a que sean confirmadas antes de hacer una nueva.')
+      }
+
+      // ── Upload y registro ────────────────────────────────────
+
+      // 3. Upload proof to Supabase Storage
+      const ext = file.name.split('.').pop().toLowerCase()
       const path = `${user.id}/${Date.now()}.${ext}`
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('payment-proofs')
@@ -74,7 +103,7 @@ export default function ReservationModal({ product, onClose }) {
         .from('payment-proofs')
         .getPublicUrl(uploadData.path)
 
-      // 2. Insert reservation
+      // 4. Insert reservation
       const { data: insertData, error: insertError } = await supabase.from('reservations').insert({
         user_id: user.id,
         user_email: user.email,
@@ -91,7 +120,7 @@ export default function ReservationModal({ product, onClose }) {
       setReservationCode(insertData?.reservation_code || '')
       setDone(true)
 
-      // 3. Enviar email en segundo plano
+      // 5. Enviar email en segundo plano
       supabase.functions.invoke('send-reservation-email', {
         body: {
           reservation_code: insertData?.reservation_code,
@@ -183,7 +212,7 @@ export default function ReservationModal({ product, onClose }) {
                   <button
                     key={m.id}
                     onClick={() => setMethod(m.id)}
-                    className={`flex items-center gap-2 px-4 py-3 rounded-2xl border text-sm font-semibold transition-all
+                    className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-sm font-semibold transition-all
                       ${method === m.id
                         ? 'bg-accent/10 border-accent/40 text-accent'
                         : 'bg-dark-700 border-white/8 text-white/50 hover:border-white/20'}`}
@@ -195,7 +224,7 @@ export default function ReservationModal({ product, onClose }) {
             </div>
 
             {/* Datos de pago */}
-            <div className="bg-dark-700 border border-white/8 rounded-2xl overflow-hidden">
+            <div className="bg-dark-700 border border-white/8 rounded-xl overflow-hidden">
               {method === 'yape' ? (
                 <div className="px-4 py-4">
                   <p className="text-[10px] text-white/30 uppercase tracking-widest font-bold mb-3">Datos Yape</p>

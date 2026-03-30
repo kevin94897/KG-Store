@@ -1,3 +1,31 @@
+# Dependencies
+**/node_modules/
+.pnp
+.pnp.js
+
+# Testing
+/coverage
+.nyc_output
+
+# Production / Build
+**/dist/
+**/dist-ssr/
+*.local
+
+# Environment Variables (Secrets)
+.env
+.env.local
+.env.*.local
+.env.production
+.env.production.local
+.env.development.local
+.env.test.local
+
+# Supabase
+supabase/.temp/
+.supabase/
+supabase/functions/.env.local
+
 # Logs
 logs
 *.log
@@ -6,52 +34,27 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-firebase-debug.log*
 
-# Node modules
-node_modules/
-
-# Vite build output
-dist/
-dist-ssr/
-kg-store/dist/
-kg-admin/dist/
-
-# Environment variables
-.env
-.env.local
-.env.*.local
-.env.production.local
-
-# OS
+# OS / Editor
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
-
-# IDEs and Editor directories
 .vscode/*
 !.vscode/extensions.json
 .idea/
 *.swp
 *.swo
-*.sw?
-*~
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 
-# Supabase
-supabase/.temp/
-supabase/functions/.env.local
-.supabase/
-
-# Firebase
-.firebase/
-
-# Testing
-coverage/
-.nyc_output/
-
 # Misc
 *.pem
 .eslintcache
+.firebase/
+.vercel

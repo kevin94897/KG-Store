@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../utils/supabase'
+import { supabase, supabaseAdmin } from '../utils/supabase'
 import {
   BookmarkCheck, ChevronDown, ChevronRight, ExternalLink,
-  RefreshCw, User, Mail, Package, CreditCard, Phone
+  RefreshCw, User, Mail, Package, CreditCard, Phone, Trash2, Plus
 } from 'lucide-react'
+import NewReservationModal from '../components/NewReservationModal'
 
 const STATUS_STYLE = {
   pending:   'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
@@ -17,10 +18,18 @@ const STATUS_LABEL = {
 }
 const METHOD_LABEL = { yape: '📱 Yape', transfer: '🏦 Transferencia' }
 
-function ReservationCard({ res, onUpdate }) {
+function ReservationCard({ res, onUpdate, onDelete }) {
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState(res.status)
   const [saving, setSaving] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  const handleDelete = async () => {
+    setDeleting(true)
+    await supabaseAdmin.from('reservations').delete().eq('id', res.id)
+    onDelete(res.id)
+  }
 
   const date = new Date(res.created_at).toLocaleDateString('es-PE', {
     day: '2-digit', month: 'short', year: 'numeric',
@@ -29,9 +38,23 @@ function ReservationCard({ res, onUpdate }) {
 
   const updateStatus = async (s) => {
     setSaving(true)
-    await supabase.from('reservations').update({ status: s, updated_at: new Date().toISOString() }).eq('id', res.id)
+    await supabaseAdmin.from('reservations').update({ status: s, updated_at: new Date().toISOString() }).eq('id', res.id)
     setStatus(s)
     onUpdate()
+
+    // Notificar al usuario solo en estados relevantes
+    if (s === 'confirmed' || s === 'rejected') {
+      supabase.functions.invoke('notify-status-change', {
+        body: {
+          reservation_code: res.reservation_code,
+          product_name: res.product_name,
+          status: s,
+          user_email: res.user_email,
+          user_name: res.user_name,
+        },
+      }).catch(console.error)
+    }
+
     setSaving(false)
   }
 
@@ -125,6 +148,37 @@ function ReservationCard({ res, onUpdate }) {
               ))}
             </div>
           </div>
+
+          {/* Eliminar */}
+          <div className="border-t border-white/5 pt-3">
+            {!confirmDelete ? (
+              <button
+                onClick={() => setConfirmDelete(true)}
+                className="flex items-center gap-1.5 text-xs text-red-400/60 hover:text-red-400 transition-colors font-semibold"
+              >
+                <Trash2 size={13} /> Eliminar reserva
+              </button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-red-400 font-semibold">¿Confirmar eliminación?</p>
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="px-3 py-1 bg-red-500/20 border border-red-500/30 text-red-400 text-xs font-bold rounded-lg hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                >
+                  {deleting
+                    ? <span className="w-3 h-3 border border-red-400/30 border-t-red-400 rounded-full animate-spin inline-block" />
+                    : 'Eliminar'}
+                </button>
+                <button
+                  onClick={() => setConfirmDelete(false)}
+                  className="px-3 py-1 bg-white/5 border border-white/10 text-white/40 text-xs font-bold rounded-lg hover:bg-white/10 transition-colors"
+                >
+                  Cancelar
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -147,6 +201,7 @@ export default function ReservationsPage() {
   const [reservations, setReservations] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
+  const [newModalOpen, setNewModalOpen] = useState(false)
 
   const fetch = async () => {
     setLoading(true)
@@ -180,13 +235,21 @@ export default function ReservationsPage() {
           </h1>
           <p className="text-white/40 text-xs mt-0.5">{reservations.length} reserva{reservations.length !== 1 ? 's' : ''} en total</p>
         </div>
-        <button
-          onClick={fetch}
-          disabled={loading}
-          className="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 text-white/50 hover:text-white transition-colors"
-        >
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={fetch}
+            disabled={loading}
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 text-white/50 hover:text-white transition-colors"
+          >
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+          </button>
+          <button
+            onClick={() => setNewModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-2 bg-accent text-black text-xs font-bold rounded-xl hover:brightness-105 active:scale-95 transition-all"
+          >
+            <Plus size={14} /> Nueva reserva
+          </button>
+        </div>
       </div>
 
       {/* Filtros */}
@@ -231,9 +294,21 @@ export default function ReservationsPage() {
       ) : (
         <div className="space-y-3">
           {filtered.map(res => (
-            <ReservationCard key={res.id} res={res} onUpdate={fetch} />
+            <ReservationCard
+              key={res.id}
+              res={res}
+              onUpdate={fetch}
+              onDelete={(id) => setReservations(prev => prev.filter(r => r.id !== id))}
+            />
           ))}
         </div>
+      )}
+
+      {newModalOpen && (
+        <NewReservationModal
+          onClose={() => setNewModalOpen(false)}
+          onCreated={() => { fetch(); setNewModalOpen(false) }}
+        />
       )}
     </div>
   )

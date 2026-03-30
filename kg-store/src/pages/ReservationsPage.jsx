@@ -200,9 +200,9 @@ export default function ReservationsPage() {
           Mi cuenta
         </Link>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-accent/15 border border-accent/20 flex items-center justify-center">
+          {/* <div className="w-10 h-10 rounded-2xl bg-accent/15 border border-accent/20 flex items-center justify-center">
             <BookmarkCheck size={18} className="text-accent" />
-          </div>
+          </div> */}
           <div>
             <h1 className="text-xl font-bold text-white">Mis reservas</h1>
             {!isLoading && (
