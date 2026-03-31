@@ -8,7 +8,7 @@ import useSeo from '../hooks/useSeo'
 
 function HeroSection() {
   return (
-    <section 
+    <section
       className="relative overflow-hidden bg-dark-800 mx-4 mt-4 rounded-3xl p-6 pb-8 md:min-h-[500px] flex flex-col justify-center bg-cover bg-center"
       style={{ backgroundImage: "url('/kg_store_banner_home.webp')" }}
     >
@@ -32,7 +32,7 @@ function HeroSection() {
           Figuras, ediciones de PS4/PS5 y coleccionables. Paga en cuotas sin intereses.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 max-w-lg">
-          <Link to="/tienda" className="btn-accent flex-1 text-sm py-3">
+          <Link to="/tienda" className="btn-accent flex-1 text-sm py-3 md:max-w-[300px]">
             Ver tienda <ArrowRight size={16} />
           </Link>
           <Link to="/cuotas" className="btn-outline flex-none text-sm py-3 px-5">
@@ -68,8 +68,8 @@ export default function HomePage() {
   useSeo({
     title: 'KG Store | Home — Figuras, ediciones y coleccionables',
     description: 'KG Store: compra figuras, ediciones de PS4/PS5 y coleccionables con envío rápido y cuotas.',
-    url: 'https://tu-dominio.com/',
-    image: 'https://tu-dominio.com/og-image.jpg'
+    url: 'https://colecciones.grupo-gomez.com/',
+    image: 'https://colecciones.grupo-gomez.com/og-image.jpg'
   })
 
   return (

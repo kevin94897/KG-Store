@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react'
 import { thumbUrl, thumbFallback } from '../utils/thumbUrl'
 import { Link } from 'react-router-dom'
 import { supabase } from '../utils/supabase'
-import { useAuth } from '../context/AuthContext'
+import { Plus } from 'lucide-react'
 import {
-  Package, Tag, ShoppingCart, TrendingUp,
-  AlertTriangle, Plus, ChevronRight, LogOut
+  Package, Tag, TrendingUp,
+  AlertTriangle, ChevronRight, Images, BookmarkCheck
 } from 'lucide-react'
 
 function StatCard({ label, value, icon: Icon, accent, sublabel }) {
@@ -24,7 +24,6 @@ function StatCard({ label, value, icon: Icon, accent, sublabel }) {
 }
 
 export default function DashboardPage() {
-  const { user, logout } = useAuth()
   const [stats, setStats] = useState({ products: 0, categories: 0, inStock: 0, outOfStock: 0 })
   const [recentProducts, setRecentProducts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -52,27 +51,7 @@ export default function DashboardPage() {
   const STATUS_LABEL = { published: 'Publicado', draft: 'Borrador', archived: 'Archivado' }
 
   return (
-    <div className="min-h-dvh bg-dark pt-safe pb-24">
-      {/* Header */}
-      <div className="px-4 pt-5 pb-4 flex items-center justify-between bg-black">
-        <div>
-          <img src="https://mlbdbkny4xg1.i.optimole.com/w:120/h:34/q:mauto/dpr:1.3/ig:avif/https://colecciones.grupo-gomez.com/wp-content/uploads/2024/12/kg-store-logo.png" alt="KG Store" className="h-8" />
-        </div>
-        <div className="flex items-center gap-2">
-          <Link
-            to="/productos/nuevo"
-            className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent/20"
-          >
-            <Plus size={20} className="text-black" />
-          </Link>
-          <button
-            onClick={logout}
-            className="w-10 h-10 bg-dark-600 border border-white/5 rounded-xl flex items-center justify-center text-white/40 active:text-white"
-          >
-            <LogOut size={18} />
-          </button>
-        </div>
-      </div>
+    <div className="min-h-dvh bg-dark pb-24 pt-5">
 
       {/* Stats grid */}
       <div className="px-4 grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
@@ -85,7 +64,7 @@ export default function DashboardPage() {
       {/* Quick actions */}
       <div className="px-4 mb-5">
         <p className="label mb-3">Acciones rápidas</p>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <Link to="/productos/nuevo" className="card p-4 flex items-center gap-3 active:scale-[0.97] transition-all">
             <div className="w-9 h-9 bg-accent/15 rounded-xl flex items-center justify-center">
               <Plus size={18} className="text-accent" />
@@ -97,6 +76,18 @@ export default function DashboardPage() {
               <Tag size={18} className="text-white/50" />
             </div>
             <span className="text-sm font-bold text-white">Categorías</span>
+          </Link>
+          <Link to="/reservas" className="card p-4 flex items-center gap-3 active:scale-[0.97] transition-all">
+            <div className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center">
+              <BookmarkCheck size={18} className="text-white/50" />
+            </div>
+            <span className="text-sm font-bold text-white">Reservas</span>
+          </Link>
+          <Link to="/medios" className="card p-4 flex items-center gap-3 active:scale-[0.97] transition-all">
+            <div className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center">
+              <Images size={18} className="text-white/50" />
+            </div>
+            <span className="text-sm font-bold text-white">Medios</span>
           </Link>
         </div>
       </div>

@@ -346,7 +346,7 @@ export default function MediaLibraryPage() {
       {/* Header */}
       <div className="sticky top-0 z-20 bg-dark/95 backdrop-blur-xl border-b border-white/5">
         <div className="px-4 pt-4 pb-3 space-y-3">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row gap-2 md:items-center justify-between">
             <div>
               <h1 className="text-lg font-semibold text-white flex items-center gap-2">
                 <Images size={20} className="text-accent" />
@@ -464,7 +464,7 @@ export default function MediaLibraryPage() {
       </div>
 
       {/* Zona drag & drop / upload */}
-      <div className="px-4 pt-4">
+      <div className="px-4 pt-0 md:pt-4">
         <div
           onDrop={onDrop}
           onDragOver={e => { e.preventDefault(); setDragOver(true) }}

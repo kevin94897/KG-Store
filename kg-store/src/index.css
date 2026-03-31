@@ -43,10 +43,22 @@
   }
 }
 
-/* Scrollbar */
+/* Scrollbar — mobile: fino e invisible */
 ::-webkit-scrollbar { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+/* Scrollbar — desktop: más grueso y visible */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #141414; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4px;
+    border: 2px solid #141414;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: #CCFF00; }
+}
 
 /* Category filter scroll */
 .cat-scroll { scroll-snap-type: x mandatory; }

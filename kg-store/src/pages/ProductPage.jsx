@@ -2,8 +2,12 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useProduct, useProducts } from '../hooks/useProducts'
 import ProductSlider from '../components/ProductSlider'
-import { ArrowLeft, Truck, Share2, ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react'
+import { ArrowLeft, Truck, Share2, ChevronLeft, ChevronRight, X, ZoomIn, Heart, BookmarkPlus } from 'lucide-react'
 import useSeo from '../hooks/useSeo'
+import { useAuth } from '../context/AuthContext'
+import { useFavorites } from '../hooks/useFavorites'
+import ReservationModal from '../components/ReservationModal'
+import AuthModal from '../components/AuthModal'
 
 // ─── Fullscreen Modal con swipe táctil ───────────────────────
 function FullscreenGallery({ images, initialIndex, onClose }) {
@@ -54,7 +58,6 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
     // Solo swipe horizontal
     if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8) {
       isDragging.current = true
-      e.preventDefault()
       setDragOffset(dx)
     }
   }
@@ -71,7 +74,16 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
 
     touchStartX.current = null
     touchStartY.current = null
-    isDragging.current = false
+
+    // Defer resetting isDragging to prevent onClick from firing immediately after drag
+    setTimeout(() => {
+      isDragging.current = false
+    }, 50)
+  }
+
+  const handleContainerClick = () => {
+    if (isDragging.current) return
+    onClose()
   }
 
   return (
@@ -90,7 +102,7 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
         </span>
         <button
           onClick={onClose}
-          className="w-11 h-11 bg-white/10 rounded-full flex items-center justify-center text-white active:bg-white/20 transition-all"
+          className="w-11 h-11 bg-white/10 rounded-full flex items-center justify-center text-white active:bg-white/20 transition-all z-10"
         >
           <X size={22} />
         </button>
@@ -98,19 +110,19 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
 
       {/* Área imagen — ocupa todo el espacio restante, centrada */}
       <div
-        className="flex-1 relative overflow-hidden cursor-pointer min-h-0"
-        onClick={onClose}
+        className="flex-1 relative overflow-hidden cursor-pointer min-h-0 touch-none"
+        onClick={handleContainerClick}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
         {/* Imagen centrada absoluta */}
-        <div className="absolute inset-0 flex items-center justify-center px-4 py-2">
+        <div className="absolute inset-0 flex items-center justify-center px-4 py-2 pointer-events-none">
           <img
             key={current}
             src={images[current]}
             alt=""
-            className="max-w-full max-h-full object-contain select-none fade-in"
+            className="max-w-full max-h-full object-contain select-none fade-in pointer-events-auto"
             style={{
               transform: `translateX(${dragOffset}px)`,
               transition: dragOffset === 0 ? 'transform 0.2s ease' : 'none',
@@ -118,7 +130,7 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
               WebkitUserSelect: 'none',
             }}
             draggable={false}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); handleContainerClick(); }}
           />
         </div>
 
@@ -269,12 +281,12 @@ function ImageGallery({ images }) {
 
       {/* Thumbnails */}
       {images.length > 1 && (
-        <div className="flex gap-2 px-4 mt-3 overflow-x-auto pb-1 scrollbar-hide">
+        <div className="flex gap-2 mt-3 overflow-x-auto pb-1 scrollbar-hide">
           {images.map((img, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
-              className={`shrink-0 w-14 h-14 rounded-xl overflow-hidden border-2 transition-all
+              className={`shrink-0 w-14 h-14 rounded-md overflow-hidden transition-all
                 ${i === current ? 'border-accent opacity-100' : 'border-transparent opacity-45'}`}
             >
               <img src={img} alt="" className="w-full h-full object-cover" />
@@ -318,14 +330,58 @@ function RelatedProducts({ categorySlug, currentProductId }) {
 export default function ProductPage() {
   const { slug } = useParams()
   const { product, loading } = useProduct(slug)
+  const { user } = useAuth()
+  const { isFav, toggle: toggleFav } = useFavorites(user?.id)
+  const [reserveOpen, setReserveOpen] = useState(false)
+  const [authOpen, setAuthOpen] = useState(false)
+
+  const handleFavorite = () => {
+    if (!user) { setAuthOpen(true); return }
+    toggleFav(product.id)
+  }
+
+  const handleReserve = () => {
+    if (!user) { setAuthOpen(true); return }
+    setReserveOpen(true)
+  }
+
+  const productImage = product?.images?.[0] || null
+  const productDescription = product
+    ? (product.short_description || `Compra ${product.name} en KG Store. Envío gratis a todo el Perú.`)
+    : 'Detalle del producto en KG Store'
+
+  const jsonLd = product ? {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: productDescription,
+    image: product.images || [],
+    url: `https://colecciones.grupo-gomez.com/producto/${slug}`,
+    brand: { '@type': 'Brand', name: 'KG Store' },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'PEN',
+      price: product.sale_price || product.regular_price,
+      availability: product.in_stock
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      url: `https://colecciones.grupo-gomez.com/producto/${slug}`,
+      seller: { '@type': 'Organization', name: 'KG Store' },
+    },
+    ...(product.categories && {
+      category: product.categories.name,
+    }),
+  } : null
 
   useSeo({
     title: product ? `${product.name} | KG Store` : 'KG Store | Producto',
-    description: product
-      ? (product.short_description || `Compra ${product.name} en cuotas`)
-      : 'Detalle del producto en KG Store',
-    url: `https://colecciones.grupo-gomez.com/producto/${slug}`,
-    image: product?.images?.[0] || 'https://colecciones.grupo-gomez.com/og-image.jpg',
+    description: productDescription,
+    url: `/producto/${slug}`,
+    image: productImage,
+    imageWidth: 1200,
+    imageHeight: 1200,
+    type: 'product',
+    jsonLd,
   })
 
   const handleWhatsApp = () => {
@@ -366,8 +422,9 @@ export default function ProductPage() {
     : 0
 
   return (
-    <div className="max-w-7xl mx-auto w-full min-h-dvh relative pt-14 pb-32 fade-up">
-      {/* Botón volver solo móvil */}
+    <>
+      <div className="max-w-7xl mx-auto w-full min-h-dvh relative pt-14 pb-32 fade-up">
+        {/* Botón volver solo móvil */}
       <div className="p-4 md:hidden">
         <Link
           to="/tienda"
@@ -404,18 +461,30 @@ export default function ProductPage() {
 
         {/* Right Column: Content */}
         <div className="px-4 pt-5 md:pt-0 pb-10">
-          {/* Categoría + compartir */}
+          {/* Categoría + acciones */}
           <div className="flex items-center justify-between mb-2">
             {product.categories && (
               <span className="text-accent text-xs font-bold uppercase tracking-widest">
                 {product.categories.name}
               </span>
             )}
-            {typeof navigator !== 'undefined' && navigator.share && (
-              <button onClick={handleShare} className="text-white/40 active:text-white transition-colors p-1 md:hover:bg-white/10 md:rounded-full">
-                <Share2 size={18} />
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handleFavorite}
+                className="w-9 h-9 flex items-center justify-center rounded-full transition-colors active:scale-90"
+                aria-label={isFav(product.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+              >
+                <Heart
+                  size={20}
+                  className={isFav(product.id) ? 'text-red-500 fill-red-500' : 'text-white/40 hover:text-white'}
+                />
               </button>
-            )}
+              {typeof navigator !== 'undefined' && navigator.share && (
+                <button onClick={handleShare} className="w-9 h-9 flex items-center justify-center rounded-full text-white/40 active:text-white transition-colors md:hover:bg-white/10">
+                  <Share2 size={18} />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Nombre */}
@@ -495,13 +564,22 @@ export default function ProductPage() {
             </p>
           </Link>
 
-          {/* Desktop CTA */}
-          <div className="hidden md:block mt-8">
+          {/* Desktop CTAs */}
+          <div className="hidden md:flex flex-col gap-3 mt-8">
+            {product.in_stock && (
+              <button
+                onClick={handleReserve}
+                className="w-full btn-accent py-4 text-base"
+              >
+                <BookmarkPlus size={20} />
+                Reservar ahora
+              </button>
+            )}
             <button
               onClick={handleWhatsApp}
-              className="w-full btn-accent bg-[#25D366] text-white text-base py-4 flex items-center justify-center gap-2 rounded-full md:hover:brightness-110 md:shadow-lg md:shadow-green-500/20 transition-all font-semibold"
+              className="w-full flex items-center justify-center gap-2 border border-white/10 text-white font-semibold text-base py-4 rounded-full hover:bg-white/5 transition-all"
             >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-[#25D366]">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
               </svg>
               Consultar por WhatsApp
@@ -518,21 +596,38 @@ export default function ProductPage() {
         />
       )}
 
-      {/* CTA fijo en la parte inferior para Mobile */}
+      </div>
+
+      {/* CTA fijo mobile */}
       <div
         className="fixed bottom-0 inset-x-0 px-4 py-3 pb-safe z-40 md:hidden"
-        style={{ background: 'linear-gradient(to top, #0E0E0E 60%, transparent)' }}
+        style={{ background: 'linear-gradient(to top, #0E0E0E 70%, transparent)' }}
       >
-        <button
-          onClick={handleWhatsApp}
-          className="btn-accent bg-[#25D366] text-white text-base py-4 flex items-center justify-center gap-2 w-full font-semibold"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-          </svg>
-          Consultar por WhatsApp
-        </button>
+        <div className="flex gap-2">
+          {product.in_stock && (
+            <button
+              onClick={handleReserve}
+              className="btn-accent flex-1 py-4 text-sm"
+            >
+              <BookmarkPlus size={18} />
+              Reservar
+            </button>
+          )}
+          <button
+            onClick={handleWhatsApp}
+            className={`flex items-center justify-center gap-2 bg-[#25D366] text-white font-semibold text-sm py-4 rounded-full active:brightness-90 transition-all ${product.in_stock ? 'px-4' : 'flex-1'}`}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+            </svg>
+            {!product.in_stock && "Consultar por WhatsApp"}
+          </button>
+        </div>
       </div>
-    </div>
+
+      {/* Modales */}
+      {reserveOpen && <ReservationModal product={product} onClose={() => setReserveOpen(false)} />}
+      {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
+    </>
   )
 }
