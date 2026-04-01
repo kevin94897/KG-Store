@@ -2,13 +2,14 @@ Options -MultiViews
 RewriteEngine On
 RewriteBase /
 
-# Servir archivos y directorios reales sin modificación
+# Servir archivos y directorios reales sin modificación (assets, imágenes, etc.)
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Rutas de producto: pasar por el proxy PHP para detectar bots y servir OG tags
+# Rutas de producto + crawler conocido → PHP proxy (genera OG tags)
+RewriteCond %{HTTP_USER_AGENT} "facebookexternalhit|Facebot|Twitterbot|LinkedInBot|WhatsApp|Slackbot|TelegramBot|Discordbot|Googlebot|bingbot|Applebot|Pinterest|iframely|rogerbot|embedly|outbrain|vkShare" [NC]
 RewriteRule ^producto/([^/]+)/?$ og-proxy.php?slug=$1 [QSA,L]
 
-# Todo lo demás: SPA React (index.html)
+# Todo lo demás (usuarios normales, incluido /producto/:slug) → SPA React
 RewriteRule ^ index.html [L]
