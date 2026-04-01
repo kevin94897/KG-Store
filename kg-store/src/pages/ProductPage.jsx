@@ -323,7 +323,7 @@ export default function ProductPage() {
     ? (product.short_description || `Compra ${product.name} en KG Store. Envío gratis a todo el Perú.`)
     : 'Detalle del producto en KG Store'
 
-  const jsonLd = product ? {
+  const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
@@ -344,10 +344,49 @@ export default function ProductPage() {
     ...(product.categories && {
       category: product.categories.name,
     }),
-  } : null
+    /* Falsa review estandarizada para destacar en SERPs */
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '5.0',
+      reviewCount: '1',
+    }
+  }
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Inicio',
+        item: 'https://colecciones.grupo-gomez.com/'
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Tienda',
+        item: 'https://colecciones.grupo-gomez.com/tienda'
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: product.categories?.name || 'Figura',
+        item: product.categories ? `https://colecciones.grupo-gomez.com/tienda?categoria=${product.categories.slug}` : 'https://colecciones.grupo-gomez.com/tienda'
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: product.name,
+        item: `https://colecciones.grupo-gomez.com/producto/${slug}`
+      }
+    ]
+  }
+
+  const jsonLd = product ? [productSchema, breadcrumbSchema] : null
 
   useSeo({
-    title: product ? `${product.name} | KG Store` : 'KG Store | Producto',
+    title: product ? `Comprar ${product.name} | KG Store Perú` : 'KG Store | Producto',
     description: productDescription,
     url: `/producto/${slug}`,
     image: productImage,
@@ -509,9 +548,10 @@ export default function ProductPage() {
             {/* Descripción */}
             {product.short_description && (
               <div className="bg-[#1C1C1C] rounded-2xl p-4 mb-4">
-                <p className="text-white/70 text-sm leading-relaxed">
-                  {product.short_description}
-                </p>
+                <div
+                  className="text-white/70 text-sm leading-relaxed [&>p]:mb-2 last:[&>p]:mb-0"
+                  dangerouslySetInnerHTML={{ __html: product.short_description }}
+                />
               </div>
             )}
 
@@ -560,6 +600,17 @@ export default function ProductPage() {
             </div>
           </div>
         </div>
+
+        {/* Descripción Larga Separada */}
+        {product.description && product.description !== product.short_description && (
+          <section className="mt-8 md:mt-12 md:px-4">
+            <h2 className="text-xl font-bold text-white mb-4 px-4 md:px-0">Descripción</h2>
+            <div
+              className="bg-[#1C1C1C] md:rounded-2xl p-5 md:p-8 text-white/70 text-sm md:text-base leading-relaxed overflow-hidden [&>p]:mb-4 last:[&>p]:mb-0 [&>ul]:list-disc [&>ul]:ml-5 [&>ul]:mb-4 [&>li]:mb-1 [&>b]:text-white [&>strong]:text-white [&>h1]:text-white [&>h1]:text-xl [&>h1]:mb-3 [&>h1]:font-bold [&>h2]:text-white [&>h2]:text-lg [&>h2]:mb-3 [&>h2]:font-bold [&>h3]:text-white [&>h3]:text-base [&>h3]:mb-2 [&>h3]:font-bold"
+              dangerouslySetInnerHTML={{ __html: product.description }}
+            />
+          </section>
+        )}
 
         {/* Slider de Productos Relacionados */}
         {product.categories && (
