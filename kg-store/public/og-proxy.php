@@ -1,69 +1,33 @@
 <?php
 /**
- * OG Meta Tags Proxy para crawlers de redes sociales.
+ * OG Meta Tags Proxy — solo recibe requests de crawlers de redes sociales.
+ * El .htaccess filtra los bots antes de llegar aquí, por lo que usuarios
+ * normales nunca ejecutan este script (van directo a index.html vía Apache).
  *
- * Las redes sociales (Facebook, WhatsApp, Twitter, etc.) NO ejecutan JavaScript,
- * por lo que no ven los meta tags generados por React.
- * Este script detecta crawlers y sirve HTML estático con las OG tags correctas
- * del producto, obtenidas de Supabase REST API.
- *
- * Usuarios normales reciben index.html (la SPA de React) sin cambios.
+ * Consulta Supabase REST API y devuelve HTML estático con las OG tags
+ * correctas para el producto solicitado.
  */
-
-// ── Configuración ────────────────────────────────────────────────────────────
 
 define('SUPABASE_URL', 'https://jkwndsbhrycyqwweungi.supabase.co');
 define('SUPABASE_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imprd25kc2JocnljeXF3d2V1bmdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0OTgyODUsImV4cCI6MjA4OTA3NDI4NX0.8LUvlqU_1LqzUuy6ckXoPYHbl9U8JRN2frBQIupyr6A');
 define('SITE_URL',     'https://colecciones.grupo-gomez.com');
 
-// ── Detección de crawlers ─────────────────────────────────────────────────────
-
-$ua = strtolower($_SERVER['HTTP_USER_AGENT'] ?? '');
-
-$crawlers = [
-    'facebookexternalhit', 'facebot', 'twitterbot', 'linkedinbot',
-    'whatsapp', 'slackbot', 'telegrambot', 'discordbot',
-    'googlebot', 'bingbot', 'applebot', 'rogerbot',
-    'embedly', 'outbrain', 'pinterest', 'iframely', 'vkshare',
-];
-
-$is_crawler = false;
-foreach ($crawlers as $bot) {
-    if (strpos($ua, $bot) !== false) {
-        $is_crawler = true;
-        break;
-    }
-}
-
-// ── Usuario normal: servir la SPA ─────────────────────────────────────────────
-
-if (!$is_crawler) {
-    $html_path = __DIR__ . '/index.html';
-    if (file_exists($html_path)) {
-        header('Content-Type: text/html; charset=UTF-8');
-        readfile($html_path);
-    }
-    exit;
-}
-
-// ── Crawler detectado: construir OG tags ─────────────────────────────────────
-
-// Sanitizar slug (solo letras minúsculas, números y guiones)
+// Sanitizar slug: solo letras minúsculas, números y guiones
 $slug = preg_replace('/[^a-z0-9\-]/', '', strtolower($_GET['slug'] ?? ''));
 
 if (!$slug) {
-    serve_spa();
+    http_response_code(404);
     exit;
 }
 
 $product = fetch_product($slug);
 
 if (!$product) {
-    serve_spa();
+    // Producto no encontrado: redirigir a la tienda
+    header('Location: ' . SITE_URL . '/tienda', true, 302);
     exit;
 }
 
-// Preparar datos OG
 $title       = $product['name'] . ' | KG Store';
 $raw_desc    = strip_tags($product['short_description'] ?? '');
 $description = $raw_desc
@@ -74,7 +38,6 @@ $image       = !empty($images) ? $images[0] : SITE_URL . '/og-image.jpg';
 $page_url    = SITE_URL . '/producto/' . $slug;
 
 serve_og_html($title, $description, $image, $page_url, $product['name']);
-exit;
 
 // ── Funciones ─────────────────────────────────────────────────────────────────
 
@@ -86,14 +49,13 @@ function fetch_product(string $slug): ?array
         . '&select=name,short_description,images'
         . '&limit=1';
 
-    // Usar cURL si está disponible (más confiable en hostings compartidos)
     if (function_exists('curl_init')) {
         $ch = curl_init($api_url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT        => 5,
             CURLOPT_HTTPHEADER     => [
-                'apikey: '        . SUPABASE_KEY,
+                'apikey: '               . SUPABASE_KEY,
                 'Authorization: Bearer ' . SUPABASE_KEY,
                 'Accept: application/json',
             ],
@@ -105,17 +67,15 @@ function fetch_product(string $slug): ?array
 
         if ($err || $body === false) return null;
     } else {
-        // Fallback: file_get_contents
         $context = stream_context_create([
             'http' => [
                 'method'  => 'GET',
                 'header'  =>
-                    'apikey: '              . SUPABASE_KEY . "\r\n" .
-                    'Authorization: Bearer '    . SUPABASE_KEY . "\r\n" .
-                    'Accept: application/json'  . "\r\n",
+                    'apikey: '               . SUPABASE_KEY . "\r\n" .
+                    'Authorization: Bearer ' . SUPABASE_KEY . "\r\n" .
+                    'Accept: application/json' . "\r\n",
                 'timeout' => 5,
             ],
-            'ssl' => ['verify_peer' => true],
         ]);
         $body = @file_get_contents($api_url, false, $context);
         if ($body === false) return null;
@@ -173,13 +133,4 @@ function serve_og_html(
 </body>
 </html>
 HTML;
-}
-
-function serve_spa(): void
-{
-    $html_path = __DIR__ . '/index.html';
-    if (file_exists($html_path)) {
-        header('Content-Type: text/html; charset=UTF-8');
-        readfile($html_path);
-    }
 }
