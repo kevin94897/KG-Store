@@ -345,7 +345,7 @@ export default function MediaLibraryPage() {
     <div className="min-h-dvh bg-dark pb-24 pt-safe">
       {/* Header */}
       <div className="sticky top-0 z-20 bg-dark/95 backdrop-blur-xl border-b border-white/5">
-        <div className="px-4 pt-4 pb-3 space-y-3">
+        <div className="pt-4 pb-3 space-y-3">
           <div className="flex flex-col md:flex-row gap-2 md:items-center justify-between">
             <div>
               <h1 className="text-lg font-semibold text-white flex items-center gap-2">
@@ -464,7 +464,7 @@ export default function MediaLibraryPage() {
       </div>
 
       {/* Zona drag & drop / upload */}
-      <div className="px-4 pt-0 md:pt-4">
+      <div className="pt-0 md:pt-4">
         <div
           onDrop={onDrop}
           onDragOver={e => { e.preventDefault(); setDragOver(true) }}
@@ -521,7 +521,7 @@ export default function MediaLibraryPage() {
 
       {/* Banner limpieza de duplicados */}
       {cleanResult && (
-        <div className="px-4 pt-3">
+        <div className="pt-3">
           <div className={`flex items-center gap-2.5 rounded-2xl px-4 py-3 ${cleanResult.error ? 'bg-red-900/20 border border-red-900/40' : 'bg-dark-700 border border-white/10'}`}>
             <Trash2 size={15} className={cleanResult.error ? 'text-red-400 shrink-0' : 'text-white/40 shrink-0'} />
             <p className={`text-sm flex-1 ${cleanResult.error ? 'text-red-400' : 'text-white/60'}`}>
@@ -541,7 +541,7 @@ export default function MediaLibraryPage() {
 
       {/* Banner de migración / optimización */}
       {(migPlan !== null || migRunning || migDone) && (
-        <div className="px-4 pt-3">
+        <div className="pt-3">
           {migDone && !migRunning && (
             <div className="flex items-center gap-2.5 bg-green-900/20 border border-green-900/40 rounded-2xl px-4 py-3">
               <CheckCircle2 size={16} className="text-green-400 shrink-0" />
@@ -625,7 +625,7 @@ export default function MediaLibraryPage() {
       )}
 
       {/* Grid de imágenes */}
-      <div className="px-4 pt-4">
+      <div className="pt-4">
         {loading ? (
           <div className={`grid gap-2 ${cols === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
             {Array.from({ length: 12 }).map((_, i) => (

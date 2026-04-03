@@ -160,7 +160,7 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      <div className="px-4 pt-4 space-y-3">
+      <div className="pt-4 space-y-3">
         {showForm && <NewOrderForm onSave={handleCreate} onCancel={() => setShowForm(false)} />}
 
         {loading

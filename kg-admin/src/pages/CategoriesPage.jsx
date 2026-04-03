@@ -98,7 +98,7 @@ export default function CategoriesPage() {
         </div>
       </div>
 
-      <div className="px-4 pt-4 space-y-3">
+      <div className="pt-4 space-y-3">
         {error && (
           <div className="bg-red-900/20 border border-red-900/40 rounded-xl px-4 py-3 text-red-400 text-sm flex items-center justify-between">
             {error}

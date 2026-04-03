@@ -345,7 +345,7 @@ export default function InstallmentRequestsPage() {
       </div>
 
       {/* ── Lista ── */}
-      <div className="px-4 pt-4 space-y-3">
+      <div className="pt-4 space-y-3">
         {loading ? (
           Array(4).fill(0).map((_, i) => (
             <div key={i} className="bg-[#111111] border border-white/5 rounded-2xl p-4 space-y-2">

@@ -166,7 +166,7 @@ export default function ProductFormPage() {
   return (
     <div className="min-h-dvh bg-dark pb-36 pt-safe">
       {/* Header */}
-      <div className="sticky top-0 bg-dark/95 backdrop-blur-xl z-10 px-4 pt-4 pb-3 border-b border-white/5">
+      <div className="sticky top-0 bg-dark/95 backdrop-blur-xl z-10 pt-4 pb-3 border-b border-white/5">
         <div className="flex items-center gap-3 mb-3">
           <button onClick={() => navigate(-1)}
             className="w-9 h-9 bg-dark-600 border border-white/5 rounded-xl flex items-center justify-center text-white/50 active:text-white shrink-0">
@@ -195,7 +195,7 @@ export default function ProductFormPage() {
         </div>
       </div>
 
-      <div className="px-4 pt-5 space-y-4">
+      <div className="pt-5 space-y-4">
         {/* Banner imágenes compartidas */}
         {sharedBanner && (
           <div className="flex items-center gap-2 bg-accent/10 border border-accent/30 rounded-xl px-4 py-3 text-accent text-sm">

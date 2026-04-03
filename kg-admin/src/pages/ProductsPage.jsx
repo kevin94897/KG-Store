@@ -109,7 +109,7 @@ export default function ProductsPage() {
   return (
     <div className="min-h-dvh bg-dark pb-24 pt-safe">
       {/* Header */}
-      <div className="sticky top-0 bg-dark/95 backdrop-blur-xl z-10 px-4 pt-4 pb-3 border-b border-white/5">
+      <div className="sticky top-0 bg-dark/95 backdrop-blur-xl z-10 pt-4 pb-3 border-b border-white/5">
         <div className="flex items-center justify-between mb-3">
           <div>
             <h1 className="text-xl font-semibold text-white">Productos</h1>
@@ -163,7 +163,7 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <div className="px-4 pt-4 space-y-2">
+      <div className="pt-4 space-y-2">
         {loading
           ? Array(6).fill(0).map((_, i) => <Skeleton key={i} />)
           : products.length === 0

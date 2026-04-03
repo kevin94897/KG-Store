@@ -50,7 +50,7 @@ export default function AdminProfileModal({ onClose }) {
           </button>
         </div>
 
-        <div className="px-5 py-5 space-y-4">
+        <div className="px-5 py-5 space-y-2">
           {/* Avatar */}
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center font-bold text-accent text-base">
@@ -114,7 +114,7 @@ export default function AdminProfileModal({ onClose }) {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="w-full flex items-center justify-center gap-2 bg-accent text-black font-bold text-sm py-3 rounded-2xl hover:brightness-105 active:scale-95 transition-all disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 bg-accent text-black font-bold text-sm py-3 rounded-xl hover:brightness-105 active:scale-95 transition-all disabled:opacity-50"
           >
             {saving
               ? <span className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
@@ -124,7 +124,7 @@ export default function AdminProfileModal({ onClose }) {
           {/* Cerrar sesión */}
           <button
             onClick={logout}
-            className="w-full flex items-center justify-center gap-2 border border-red-500/20 text-red-400 hover:bg-red-500/10 font-semibold text-sm py-2.5 rounded-2xl transition-all"
+            className="w-full flex items-center justify-center gap-2 border border-red-500/20 text-red-400 hover:bg-red-500/10 font-semibold text-sm py-2.5 rounded-xl transition-all"
           >
             <LogOut size={14} /> Cerrar sesión
           </button>

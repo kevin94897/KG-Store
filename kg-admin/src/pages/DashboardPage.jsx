@@ -54,7 +54,7 @@ export default function DashboardPage() {
     <div className="min-h-dvh bg-dark pb-24 pt-5">
 
       {/* Stats grid */}
-      <div className="px-4 grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
         <StatCard label="Productos" value={stats.products} icon={Package} accent />
         <StatCard label="Categorías" value={stats.categories} icon={Tag} />
         <StatCard label="En stock" value={stats.inStock} icon={TrendingUp} accent />
@@ -62,7 +62,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick actions */}
-      <div className="px-4 mb-5">
+      <div className="mb-5">
         <p className="label mb-3">Acciones rápidas</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <Link to="/productos/nuevo" className="card p-4 flex items-center gap-3 active:scale-[0.97] transition-all">
@@ -93,7 +93,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent products */}
-      <div className="px-4">
+      <div className="">
         <div className="flex items-center justify-between mb-3">
           <p className="label">Últimos productos</p>
           <Link to="/productos" className="text-accent text-xs font-bold">Ver todos</Link>
