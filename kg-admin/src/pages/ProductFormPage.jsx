@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../utils/supabase'
 import ImageUploader from '../components/ImageUploader'
 import { useSharedImagesOnLoad } from '../hooks/usePWA'
+import { useDemo } from '../context/DemoContext'
 import {
   ArrowLeft, Save, Trash2, Check, AlertCircle,
   ChevronDown, ToggleLeft, ToggleRight, Share2
@@ -39,6 +40,7 @@ export default function ProductFormPage() {
   const { id } = useParams()
   const isEdit = Boolean(id) && id !== 'nuevo'
   const navigate = useNavigate()
+  const { demoGuard } = useDemo()
 
   const [form, setForm] = useState(EMPTY)
   const [categories, setCategories] = useState([])
@@ -55,6 +57,7 @@ export default function ProductFormPage() {
   useSharedImagesOnLoad({
     onSharedImages: async (files) => {
       if (!files.length) return
+      if (demoGuard(() => {}) === false) return
 
       // Subir cada archivo a Supabase Storage
       setSharedBanner(true)
@@ -111,6 +114,7 @@ export default function ProductFormPage() {
   }
 
   const handleSave = async () => {
+    if (demoGuard(() => {}) === false) return
     if (!form.name.trim()) { setError('El nombre es requerido'); return }
     setSaving(true); setError('')
     try {
@@ -149,6 +153,7 @@ export default function ProductFormPage() {
   }
 
   const handleDelete = async () => {
+    if (demoGuard(() => {}) === false) return
     if (!window.confirm('¿Eliminar este producto?')) return
     setDeleting(true)
     await supabase.from('products').delete().eq('id', id)

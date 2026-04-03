@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../utils/supabase'
 import { useAuth } from '../context/AuthContext'
+import { useDemo, DEMO_CLIENT } from '../context/DemoContext'
 import { Users, Search, BookmarkCheck, Heart, ChevronRight, RefreshCw } from 'lucide-react'
 
 function UserAvatar({ profile }) {
@@ -21,6 +22,7 @@ function UserAvatar({ profile }) {
 
 export default function UsersPage() {
   const { user: adminUser } = useAuth()
+  const { isDemo } = useDemo()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -57,11 +59,12 @@ export default function UsersPage() {
       return acc
     }, {})
 
-    setUsers(profiles.filter(p => p.id !== adminUser?.id).map(p => ({
+    const real = profiles.filter(p => p.id !== adminUser?.id).map(p => ({
       ...p,
       reservation_count: resMap[p.id] || 0,
       favorite_count: favMap[p.id] || 0,
-    })))
+    }))
+    setUsers(isDemo ? [DEMO_CLIENT, ...real] : real)
     setLoading(false)
   }
 

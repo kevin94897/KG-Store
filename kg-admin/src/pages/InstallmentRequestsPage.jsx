@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../utils/supabase'
+import { useDemo, DEMO_INSTALLMENT } from '../context/DemoContext'
 import {
   CreditCard, ChevronRight, ChevronDown, Phone,
   Mail, Package, RefreshCw, User, Trash2
@@ -26,6 +27,7 @@ function RequestCard({ req, onUpdate, selected, onToggleSelect }) {
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState(req.status)
   const [saving, setSaving] = useState(false)
+  const { demoGuard } = useDemo()
 
   const date = new Date(req.created_at).toLocaleDateString('es-PE', {
     day: '2-digit', month: 'short', year: 'numeric',
@@ -33,6 +35,7 @@ function RequestCard({ req, onUpdate, selected, onToggleSelect }) {
   })
 
   const updateStatus = async (s) => {
+    if (demoGuard(() => {}) === false) return
     setSaving(true)
     await supabase.from('installment_requests').update({ status: s }).eq('id', req.id)
     setStatus(s)
@@ -218,13 +221,14 @@ export default function InstallmentRequestsPage() {
   const [filter, setFilter] = useState('all')
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [busy, setBusy] = useState(false)
+  const { demoGuard, isDemo } = useDemo()
 
   const load = async () => {
     const { data } = await supabase
       .from('installment_requests')
       .select('*')
       .order('created_at', { ascending: false })
-    setRequests(data || [])
+    setRequests(isDemo ? [DEMO_INSTALLMENT, ...(data || [])] : (data || []))
     setSelectedIds(new Set())
   }
 
@@ -248,6 +252,7 @@ export default function InstallmentRequestsPage() {
 
   const deleteSelected = async () => {
     if (selectedIds.size === 0) return
+    if (demoGuard(() => {}) === false) return
     if (!window.confirm(`¿Eliminar ${selectedIds.size} solicitud(es)?`)) return
     setBusy(true)
     const { error } = await supabase

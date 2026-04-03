@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react'
+import { supabase } from '../utils/supabase'
+import { Eye, EyeOff, LogIn, AlertCircle, MonitorPlay } from 'lucide-react'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -77,6 +78,26 @@ export default function LoginPage() {
             {loading ? 'Entrando...' : 'Ingresar'}
           </button>
         </div>
+
+        <div className="relative flex items-center gap-3">
+          <div className="flex-1 h-px bg-white/8" />
+          <span className="text-white/20 text-xs">o</span>
+          <div className="flex-1 h-px bg-white/8" />
+        </div>
+
+        <button
+          onClick={async () => {
+            setLoading(true)
+            supabase.from('demo_clicks').insert({}).then(() => {})
+            await login('demo@kgstore.com', 'demo1234')
+            setLoading(false)
+          }}
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-2 border border-accent/30 text-accent font-semibold text-sm py-3 rounded-xl hover:bg-accent/5 active:scale-95 transition-all disabled:opacity-40"
+        >
+          <MonitorPlay size={16} />
+          Ver demo del panel
+        </button>
 
         <p className="text-center text-xs text-white/20">
           Usa tus credenciales de Supabase Auth

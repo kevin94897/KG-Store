@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { supabase } from '../utils/supabase'
+import { useDemo } from '../context/DemoContext'
 import { optimizeImages, generateAllVariantsFromUrl } from '../utils/imageOptimizer'
 import { mediumUrl, mediumFallback } from '../utils/thumbUrl'
 import {
@@ -25,6 +26,7 @@ function extractPath(publicUrl) {
 }
 
 export default function MediaLibraryPage() {
+  const { demoGuard } = useDemo()
   const [files, setFiles] = useState([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
@@ -76,6 +78,7 @@ export default function MediaLibraryPage() {
   const handleFiles = useCallback(async (fileList) => {
     const arr = Array.from(fileList).filter(f => f.type.startsWith('image/'))
     if (!arr.length) return
+    if (demoGuard(() => {}) === false) return
     setUploading(true)
     setError('')
     try {
@@ -120,6 +123,7 @@ export default function MediaLibraryPage() {
   // ── Eliminar seleccionados (web + thumb + medium) ─────────────
   const deleteSelected = async () => {
     if (!selected.size) return
+    if (demoGuard(() => {}) === false) return
     setDeleting(true)
     setError('')
     try {

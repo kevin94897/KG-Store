@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { X, Package, DollarSign, AlertCircle, CheckCircle, Search, ChevronDown } from 'lucide-react'
 import { supabase, supabaseAdmin } from '../utils/supabase'
+import { useDemo } from '../context/DemoContext'
 
 const METHOD_OPTIONS = [
   { id: 'yape', label: '📱 Yape' },
@@ -100,6 +101,7 @@ function UserDropdown({ users, selected, onSelect }) {
 }
 
 export default function NewReservationModal({ onClose, onCreated }) {
+  const { demoGuard } = useDemo()
   const [users, setUsers] = useState([])
   const [loadingUsers, setLoadingUsers] = useState(true)
   const [selectedUser, setSelectedUser] = useState(null)
@@ -121,6 +123,7 @@ export default function NewReservationModal({ onClose, onCreated }) {
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
   const handleSubmit = async () => {
+    if (demoGuard(() => {}) === false) return
     if (!selectedUser) { setError('Debes seleccionar un cliente.'); return }
     if (!form.product_name.trim()) { setError('El nombre del producto es obligatorio.'); return }
 

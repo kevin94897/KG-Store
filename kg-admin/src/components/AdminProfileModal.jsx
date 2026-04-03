@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react'
 import { X, User, Mail, Phone, Check, LogOut } from 'lucide-react'
 import { supabase } from '../utils/supabase'
 import { useAuth } from '../context/AuthContext'
+import { useDemo } from '../context/DemoContext'
 
 export default function AdminProfileModal({ onClose }) {
   const { user, logout } = useAuth()
+  const { demoGuard } = useDemo()
   const [form, setForm] = useState({ full_name: '', phone: '' })
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -18,6 +20,7 @@ export default function AdminProfileModal({ onClose }) {
   }, [user])
 
   const handleSave = async () => {
+    if (demoGuard(() => {}) === false) return
     setSaving(true)
     await supabase.from('profiles').upsert({
       id: user.id,

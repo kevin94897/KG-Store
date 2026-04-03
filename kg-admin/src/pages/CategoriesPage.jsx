@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../utils/supabase'
+import { useDemo } from '../context/DemoContext'
 import { Plus, Pencil, Trash2, Check, X, Tag, FolderOpen, ArrowLeft } from 'lucide-react'
 
 function Form({ initial, onSave, onCancel }) {
@@ -44,6 +45,7 @@ function Form({ initial, onSave, onCancel }) {
 
 export default function CategoriesPage() {
   const navigate = useNavigate()
+  const { demoGuard } = useDemo()
   const [cats, setCats] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -56,6 +58,7 @@ export default function CategoriesPage() {
   useEffect(() => { load() }, [])
 
   const handleSave = async (data) => {
+    if (demoGuard(() => {}) === false) return
     try {
       if (editing) {
         const { error: e } = await supabase.from('categories').update(data).eq('id', editing.id)
@@ -69,6 +72,7 @@ export default function CategoriesPage() {
   }
 
   const handleDelete = async (cat) => {
+    if (demoGuard(() => {}) === false) return
     if (!window.confirm(`¿Eliminar "${cat.name}"?`)) return
     const { error: e } = await supabase.from('categories').delete().eq('id', cat.id)
     if (e) setError(e.message)

@@ -61,7 +61,7 @@ export default function MediaPickerModal({ onSelect, onClose, multiple = true })
   )
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-dark">
+    <div className="fixed inset-0 z-50 flex flex-col bg-dark" style={{ height: '100dvh' }}>
       {/* Header */}
       <div className="bg-dark-800 border-b border-white/5 px-4 pt-safe pb-3 shrink-0">
         <div className="flex items-center justify-between mb-3">

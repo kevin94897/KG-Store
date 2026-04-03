@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react'
 import { thumbUrl, thumbFallback } from '../utils/thumbUrl'
 import { Link } from 'react-router-dom'
 import { supabase } from '../utils/supabase'
+import { useDemo } from '../context/DemoContext'
 import { Plus } from 'lucide-react'
 import {
   Package, Tag, TrendingUp,
-  AlertTriangle, ChevronRight, Images, BookmarkCheck
+  AlertTriangle, ChevronRight, Images, BookmarkCheck, MonitorPlay
 } from 'lucide-react'
 
 function StatCard({ label, value, icon: Icon, accent, sublabel }) {
@@ -24,9 +25,11 @@ function StatCard({ label, value, icon: Icon, accent, sublabel }) {
 }
 
 export default function DashboardPage() {
+  const { isDemo } = useDemo()
   const [stats, setStats] = useState({ products: 0, categories: 0, inStock: 0, outOfStock: 0 })
   const [recentProducts, setRecentProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [demoClicks, setDemoClicks] = useState(null)
 
   useEffect(() => {
     Promise.all([
@@ -34,7 +37,8 @@ export default function DashboardPage() {
       supabase.from('categories').select('id', { count: 'exact' }),
       supabase.from('products').select('id, name, images, regular_price, status, in_stock, categories(name)')
         .order('created_at', { ascending: false }).limit(5),
-    ]).then(([productsRes, catsRes, recentRes]) => {
+      supabase.from('demo_clicks').select('clicked_at', { count: 'exact' }).order('clicked_at', { ascending: false }).limit(1),
+    ]).then(([productsRes, catsRes, recentRes, clicksRes]) => {
       const prods = productsRes.data || []
       setStats({
         products: productsRes.count || prods.length,
@@ -43,6 +47,10 @@ export default function DashboardPage() {
         outOfStock: prods.filter(p => !p.in_stock).length,
       })
       setRecentProducts(recentRes.data || [])
+      setDemoClicks({
+        total: clicksRes.count || 0,
+        last: clicksRes.data?.[0]?.clicked_at || null,
+      })
       setLoading(false)
     })
   }, [])
@@ -91,6 +99,26 @@ export default function DashboardPage() {
           </Link>
         </div>
       </div>
+
+      {/* Demo clicks — solo visible al admin real */}
+      {!isDemo && demoClicks !== null && (
+        <div className="mb-5 card p-4 flex items-center gap-3">
+          <div className="w-9 h-9 bg-accent/10 rounded-xl flex items-center justify-center shrink-0">
+            <MonitorPlay size={17} className="text-accent" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs text-white/40 font-semibold uppercase tracking-wider">Accesos al demo</p>
+            <p className="text-white font-bold text-sm">
+              {demoClicks.total} {demoClicks.total === 1 ? 'vez' : 'veces'}
+              {demoClicks.last && (
+                <span className="text-white/30 font-normal ml-2 text-xs">
+                  · último {new Date(demoClicks.last).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Recent products */}
       <div className="">

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase, supabaseAdmin } from '../utils/supabase'
+import { useDemo } from '../context/DemoContext'
 import {
   BookmarkCheck, ChevronDown, ChevronRight, ExternalLink,
   RefreshCw, User, Mail, Package, CreditCard, Phone, Trash2, Plus
@@ -24,8 +25,10 @@ function ReservationCard({ res, onUpdate, onDelete }) {
   const [saving, setSaving] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const { demoGuard } = useDemo()
 
   const handleDelete = async () => {
+    if (demoGuard(() => {}) === false) return
     setDeleting(true)
     await supabaseAdmin.from('reservations').delete().eq('id', res.id)
     onDelete(res.id)
@@ -37,6 +40,7 @@ function ReservationCard({ res, onUpdate, onDelete }) {
   })
 
   const updateStatus = async (s) => {
+    if (demoGuard(() => {}) === false) return
     setSaving(true)
     await supabaseAdmin.from('reservations').update({ status: s, updated_at: new Date().toISOString() }).eq('id', res.id)
     setStatus(s)
@@ -202,6 +206,7 @@ export default function ReservationsPage() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
   const [newModalOpen, setNewModalOpen] = useState(false)
+  const { demoGuard } = useDemo()
 
   const fetch = async () => {
     setLoading(true)
@@ -244,7 +249,7 @@ export default function ReservationsPage() {
             <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
           </button>
           <button
-            onClick={() => setNewModalOpen(true)}
+            onClick={() => { if (demoGuard(() => {}) === false) return; setNewModalOpen(true) }}
             className="flex items-center gap-1.5 px-3 py-2 bg-accent text-black text-xs font-bold rounded-xl hover:brightness-105 active:scale-95 transition-all"
           >
             <Plus size={14} /> Nueva reserva

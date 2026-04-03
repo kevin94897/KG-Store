@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../utils/supabase'
+import { useDemo } from '../context/DemoContext'
 import { Plus, ChevronRight, ShoppingCart, X, Check, ChevronDown } from 'lucide-react'
 
 const STATUS_STYLE = {
@@ -18,8 +19,10 @@ function OrderCard({ order, onUpdate }) {
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState(order.status)
   const [saving, setSaving] = useState(false)
+  const { demoGuard } = useDemo()
 
   const updateStatus = async (s) => {
+    if (demoGuard(() => {}) === false) return
     setSaving(true)
     await supabase.from('orders').update({ status: s }).eq('id', order.id)
     setStatus(s)
@@ -109,6 +112,7 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [filter, setFilter] = useState('all')
+  const { demoGuard } = useDemo()
 
   const load = () => supabase.from('orders').select('*').order('created_at', { ascending: false })
     .then(({ data }) => { setOrders(data || []); setLoading(false) })
@@ -116,6 +120,7 @@ export default function OrdersPage() {
   useEffect(() => { load() }, [])
 
   const handleCreate = async (data) => {
+    if (demoGuard(() => {}) === false) return
     await supabase.from('orders').insert({
       ...data,
       total: data.total ? parseFloat(data.total) : null,

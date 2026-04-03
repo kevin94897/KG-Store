@@ -1,7 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { DemoProvider, useDemo } from './context/DemoContext'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import BottomNav from './components/BottomNav'
 import AdminHeader from './components/AdminHeader'
+import DemoBanner from './components/DemoBanner'
+import DemoToast from './components/DemoToast'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import ProductsPage from './pages/ProductsPage'
@@ -16,6 +19,7 @@ import UserDetailPage from './pages/UserDetailPage'
 
 function AppRoutes() {
   const { user, loading } = useAuth()
+  const { isDemo } = useDemo()
 
   if (loading) return (
     <div className="min-h-dvh bg-dark flex items-center justify-center">
@@ -28,7 +32,8 @@ function AppRoutes() {
   return (
     <div className="min-h-dvh bg-dark">
       <AdminHeader />
-      <div className="max-w-7xl mx-auto px-4 min-h-dvh relative pt-14">
+      <DemoBanner />
+      <div className={`max-w-7xl mx-auto px-4 min-h-dvh relative ${isDemo ? 'pt-20' : 'pt-14'}`}>
         <Routes>
           <Route path="/"            element={<DashboardPage />} />
           <Route path="/productos"   element={<ProductsPage />} />
@@ -45,16 +50,19 @@ function AppRoutes() {
         </Routes>
         <BottomNav />
       </div>
+      <DemoToast />
     </div>
   )
 }
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </AuthProvider>
+    <DemoProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </AuthProvider>
+    </DemoProvider>
   )
 }

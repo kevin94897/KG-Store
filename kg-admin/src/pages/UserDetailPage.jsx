@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../utils/supabase'
+import { useDemo, DEMO_CLIENT, DEMO_CLIENT_RESERVATIONS } from '../context/DemoContext'
 import {
   ArrowLeft, User, Mail, Phone, Calendar, Heart,
   BookmarkCheck, ExternalLink, Package
@@ -45,6 +46,7 @@ function InfoRow({ icon: Icon, label, value }) {
 export default function UserDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { isDemo } = useDemo()
   const [profile, setProfile] = useState(null)
   const [reservations, setReservations] = useState([])
   const [favorites, setFavorites] = useState([])
@@ -54,6 +56,15 @@ export default function UserDetailPage() {
   useEffect(() => {
     const load = async () => {
       setLoading(true)
+
+      if (isDemo && id === DEMO_CLIENT.id) {
+        setProfile(DEMO_CLIENT)
+        setReservations(DEMO_CLIENT_RESERVATIONS)
+        setFavorites([])
+        setLoading(false)
+        return
+      }
+
       const [
         { data: prof },
         { data: res },
