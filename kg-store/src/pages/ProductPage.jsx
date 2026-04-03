@@ -173,7 +173,13 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
 // ─── Galería principal del producto ──────────────────────────
 function ImageGallery({ images, onOpen }) {
   const [current, setCurrent] = useState(0)
+  const [imageLoading, setImageLoading] = useState(true)
   const touchStartX = useRef(null)
+
+  // Reiniciar loading cuando cambia la imagen
+  useEffect(() => {
+    setImageLoading(true)
+  }, [current])
 
   if (!images?.length) return (
     <div className="aspect-square bg-[#1C1C1C] flex items-center justify-center">
@@ -198,19 +204,25 @@ function ImageGallery({ images, onOpen }) {
       <div className="relative" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         {/* Imagen principal */}
         <div
-          className="aspect-square bg-[#1C1C1C] overflow-hidden cursor-zoom-in md:rounded-2xl"
+          className="aspect-square bg-[#1C1C1C] overflow-hidden cursor-zoom-in md:rounded-2xl relative"
           onClick={() => onOpen(current)}
         >
+          {imageLoading && (
+            <div className="absolute inset-0 skeleton" />
+          )}
           <img
             key={current}
             src={images[current]}
             alt=""
-            className="w-full h-full object-cover fade-in"
+            className={`w-full h-full object-cover transition-opacity duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100 fade-in'}`}
+            onLoad={() => setImageLoading(false)}
           />
           {/* Icono zoom — solo desktop */}
-          <div className="hidden md:flex absolute inset-0 items-center justify-center bg-black/0 hover:bg-black/20 transition-colors">
-            <ZoomIn size={32} className="text-white opacity-0 hover:opacity-100 transition-opacity drop-shadow-lg" />
-          </div>
+          {!imageLoading && (
+            <div className="hidden md:flex absolute inset-0 items-center justify-center bg-black/0 hover:bg-black/20 transition-colors">
+              <ZoomIn size={32} className="text-white opacity-0 hover:opacity-100 transition-opacity drop-shadow-lg" />
+            </div>
+          )}
         </div>
 
         {/* Flechas — solo si hay más de 1 imagen */}
@@ -308,6 +320,7 @@ export default function ProductPage() {
   const [galleryOpen, setGalleryOpen] = useState(false)
   const [galleryIndex, setGalleryIndex] = useState(0)
 
+
   const handleFavorite = () => {
     if (!user) { setAuthOpen(true); return }
     toggleFav(product.id)
@@ -323,7 +336,7 @@ export default function ProductPage() {
     ? (product.short_description || `Compra ${product.name} en KG Store. Envío gratis a todo el Perú.`)
     : 'Detalle del producto en KG Store'
 
-  const productSchema = {
+  const productSchema = product ? {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
@@ -350,9 +363,9 @@ export default function ProductPage() {
       ratingValue: '5.0',
       reviewCount: '1',
     }
-  }
+  } : null
 
-  const breadcrumbSchema = {
+  const breadcrumbSchema = product ? {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
@@ -381,9 +394,9 @@ export default function ProductPage() {
         item: `https://colecciones.grupo-gomez.com/producto/${slug}`
       }
     ]
-  }
+  } : null
 
-  const jsonLd = product ? [productSchema, breadcrumbSchema] : null
+  const jsonLd = (product && productSchema && breadcrumbSchema) ? [productSchema, breadcrumbSchema] : null
 
   useSeo({
     title: product ? `Comprar ${product.name} | KG Store Perú` : 'KG Store | Producto',

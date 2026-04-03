@@ -277,7 +277,7 @@ export default function Header({ cartCount = 0 }) {
 
       {/* Mobile fullscreen menu */}
       {menuOpen && (
-        <div className="md:hidden fixed inset-0 z-40 bg-dark/98 backdrop-blur-xl flex flex-col justify-center px-8 pt-safe fade-in">
+        <div className="md:hidden fixed inset-0 z-50 bg-dark/98 backdrop-blur-xl flex flex-col justify-center px-8 pt-safe fade-in">
           <div className="max-w-7xl mx-auto">
             <button
               onClick={() => setMenuOpen(false)}

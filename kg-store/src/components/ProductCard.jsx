@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Truck } from 'lucide-react'
 import { mediumUrl, mediumFallback } from '../utils/thumbUrl'
@@ -21,6 +22,7 @@ function PriceBadge({ regular, sale }) {
 }
 
 export default function ProductCard({ product }) {
+  const [imgLoading, setImgLoading] = useState(true)
   const mainImage = product.images?.[0]
   const isSoldOut = !product.in_stock
   const hasSale = product.sale_price && product.sale_price < product.regular_price
@@ -30,13 +32,21 @@ export default function ProductCard({ product }) {
     <Link to={`/producto/${product.slug}`} className="product-card block group">
       {/* Image */}
       <div className="relative aspect-square overflow-hidden bg-dark-700">
+        {imgLoading && (
+          <div className="absolute inset-0 skeleton z-10" />
+        )}
+        
         {mainImage ? (
           <img
             src={mediumUrl(mainImage)}
             alt={product.name}
-            className="w-full h-full object-cover group-active:scale-105 transition-transform duration-300"
+            className={`w-full h-full object-cover group-active:scale-105 transition-all duration-500 ${imgLoading ? 'opacity-0 scale-110 blur-sm' : 'opacity-100 scale-100 blur-0'}`}
             loading="lazy"
-            onError={mediumFallback(mainImage)}
+            onLoad={() => setImgLoading(false)}
+            onError={(e) => {
+              setImgLoading(false)
+              mediumFallback(mainImage)(e)
+            }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-white/10">
