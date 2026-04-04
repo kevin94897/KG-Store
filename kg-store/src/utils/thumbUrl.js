@@ -17,9 +17,27 @@ export function mediumUrl(url) {
   )
 }
 
+export function thumbUrl(url) {
+  if (!url) return null
+  if (!url.includes('/storage/v1/object/public/')) return url
+  const clean = url.split('?')[0]
+  return clean.replace(
+    /\/products\/(?!thumbs\/|medium\/)([^/]+)\.\w+$/,
+    '/products/thumbs/$1.webp'
+  )
+}
+
 export function mediumFallback(originalUrl) {
   return (e) => {
     e.currentTarget.onerror = null
     e.currentTarget.src = originalUrl
+  }
+}
+
+export function thumbFallback(originalUrl) {
+  return (e) => {
+    e.currentTarget.onerror = null
+    // Intenta medium antes de ir al full
+    e.currentTarget.src = mediumUrl(originalUrl) || originalUrl
   }
 }

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useProduct, useProducts } from '../hooks/useProducts'
 import ProductSlider from '../components/ProductSlider'
+import { mediumUrl, mediumFallback, thumbUrl, thumbFallback } from '../utils/thumbUrl'
 import { ArrowLeft, Truck, Share2, ChevronLeft, ChevronRight, X, ZoomIn, Heart, BookmarkPlus } from 'lucide-react'
 import useSeo from '../hooks/useSeo'
 import { useAuth } from '../context/AuthContext'
@@ -158,7 +159,7 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
                   className={`shrink-0 w-12 h-12 md:w-14 md:h-14 rounded-xl overflow-hidden border-2 transition-all
                     ${i === current ? 'border-white opacity-100' : 'border-transparent opacity-40 active:opacity-70'}`}
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover" draggable={false} />
+                  <img src={thumbUrl(img) || img} alt="" className="w-full h-full object-cover" draggable={false} onError={thumbFallback(img)} />
                 </button>
               ))}
             </div>
@@ -212,10 +213,11 @@ function ImageGallery({ images, onOpen }) {
           )}
           <img
             key={current}
-            src={images[current]}
+            src={mediumUrl(images[current]) || images[current]}
             alt=""
             className={`w-full h-full object-cover transition-opacity duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100 fade-in'}`}
             onLoad={() => setImageLoading(false)}
+            onError={mediumFallback(images[current])}
           />
           {/* Icono zoom — solo desktop */}
           {!imageLoading && (
@@ -280,7 +282,7 @@ function ImageGallery({ images, onOpen }) {
               className={`shrink-0 w-14 h-14 rounded-md overflow-hidden border-2 transition-all
                 ${i === current ? 'border-accent opacity-100' : 'border-transparent opacity-45'}`}
             >
-              <img src={img} alt="" className="w-full h-full object-cover" />
+              <img src={thumbUrl(img) || img} alt="" className="w-full h-full object-cover" onError={thumbFallback(img)} />
             </button>
           ))}
         </div>
