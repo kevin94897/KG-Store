@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useProduct, useProducts } from '../hooks/useProducts'
 import ProductSlider from '../components/ProductSlider'
-import { mediumUrl, mediumFallback, thumbUrl, thumbFallback } from '../utils/thumbUrl'
+import { cdnUrl, mediumUrl, mediumFallback, thumbUrl, thumbFallback } from '../utils/thumbUrl'
 import { ArrowLeft, Truck, Share2, ChevronLeft, ChevronRight, X, ZoomIn, Heart, BookmarkPlus } from 'lucide-react'
 import useSeo from '../hooks/useSeo'
 import { useAuth } from '../context/AuthContext'
@@ -105,7 +105,7 @@ function FullscreenGallery({ images, initialIndex, onClose }) {
             contentStyle={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             <img
-              src={images[current]}
+              src={cdnUrl(images[current])}
               alt=""
               className="max-w-full max-h-full object-contain select-none fade-in"
               draggable={false}
