@@ -25,6 +25,8 @@
 supabase/.temp/
 .supabase/
 supabase/functions/.env.local
+supabase/functions/**/.env
+supabase/.env
 
 # Logs
 logs
@@ -53,8 +55,13 @@ Thumbs.db
 *.njsproj
 *.sln
 
-# Misc
+# Keys / Certificates
 *.pem
+*.key
+*.p12
+*.pfx
+
+# Misc
 .eslintcache
 .firebase/
 .vercel
