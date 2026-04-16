@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { DemoProvider, useDemo } from './context/DemoContext'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { usePushNotifications } from './hooks/usePushNotifications'
 import BottomNav from './components/BottomNav'
 import AdminHeader from './components/AdminHeader'
 import DemoBanner from './components/DemoBanner'
@@ -20,6 +21,7 @@ import UserDetailPage from './pages/UserDetailPage'
 function AppRoutes() {
   const { user, loading } = useAuth()
   const { isDemo } = useDemo()
+  usePushNotifications()
 
   if (loading) return (
     <div className="min-h-dvh bg-dark flex items-center justify-center">

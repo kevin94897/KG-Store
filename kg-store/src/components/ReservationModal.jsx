@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { X, Upload, CheckCircle, Copy, AlertCircle, ImageIcon, ChevronRight } from 'lucide-react'
 import { supabase } from '../utils/supabase'
+import { sendAdminPush } from '../utils/notifications'
 import { useAuth } from '../context/AuthContext'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5 MB
@@ -120,7 +121,10 @@ export default function ReservationModal({ product, onClose }) {
       setReservationCode(insertData?.reservation_code || '')
       setDone(true)
 
-      // 5. Enviar email en segundo plano
+      // 5. Push al admin en segundo plano
+      sendAdminPush('🛒 Nueva reserva', `${product.name} — ${profile?.full_name || user.email}`, '/reservas')
+
+      // 6. Email en segundo plano
       supabase.functions.invoke('send-reservation-email', {
         body: {
           reservation_code: insertData?.reservation_code,

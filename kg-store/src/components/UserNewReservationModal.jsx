@@ -4,6 +4,7 @@ import {
   ChevronRight, ImageIcon, Calendar, Hash
 } from 'lucide-react'
 import { supabase } from '../utils/supabase'
+import { sendAdminPush } from '../utils/notifications'
 import { useAuth } from '../context/AuthContext'
 import { Link } from 'react-router-dom'
 
@@ -150,6 +151,9 @@ export default function UserNewReservationModal({ onClose, onCreated }) {
       setReservationCode(insertData?.reservation_code || '')
       setDone(true)
       onCreated?.()
+
+      // Push al admin en segundo plano
+      sendAdminPush('🛒 Nueva reserva', `${form.product_name.trim()} — ${profile?.full_name || user.email}`, '/reservas')
 
       // Email en segundo plano
       supabase.functions.invoke('send-reservation-email', {

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { supabase } from '../utils/supabase'
+import { sendAdminPush } from '../utils/notifications'
 
 const AuthContext = createContext(null)
 
@@ -45,12 +46,17 @@ export function AuthProvider({ children }) {
   const loginWithEmail = (email, password) =>
     supabase.auth.signInWithPassword({ email, password })
 
-  const signupWithEmail = (email, password, fullName) =>
-    supabase.auth.signUp({
+  const signupWithEmail = async (email, password, fullName) => {
+    const result = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName } },
     })
+    if (!result.error) {
+      sendAdminPush('👤 Nuevo usuario registrado', `${fullName || email} se registró en KG Store`, '/usuarios')
+    }
+    return result
+  }
 
   const logout = async () => {
     await supabase.auth.signOut()
