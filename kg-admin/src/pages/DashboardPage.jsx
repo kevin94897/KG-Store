@@ -15,11 +15,11 @@ function StatCard({ label, value, icon: Icon, accent, sublabel }) {
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs text-white font-semibold uppercase tracking-wider">{label}</span>
         <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${accent ? 'bg-accent/15' : 'bg-white/5'}`}>
-          <Icon size={15} className={accent ? 'text-accent' : 'text-white/40'} />
+          <Icon size={15} className={accent ? 'text-accent' : 'text-ink-2'} />
         </div>
       </div>
       <p className={`text-3xl font-semibold ${accent ? 'text-accent' : 'text-white'}`}>{value}</p>
-      {sublabel && <p className="text-xs text-white/25 mt-0.5">{sublabel}</p>}
+      {sublabel && <p className="text-xs text-ink-3 mt-0.5">{sublabel}</p>}
     </div>
   )
 }
@@ -55,7 +55,7 @@ export default function DashboardPage() {
     })
   }, [])
 
-  const STATUS_COLOR = { published: 'text-green-400', draft: 'text-yellow-400', archived: 'text-white/20' }
+  const STATUS_COLOR = { published: 'text-green-400', draft: 'text-yellow-400', archived: 'text-ink-3' }
   const STATUS_LABEL = { published: 'Publicado', draft: 'Borrador', archived: 'Archivado' }
 
   return (
@@ -81,19 +81,19 @@ export default function DashboardPage() {
           </Link>
           <Link to="/categorias" className="card p-4 flex items-center gap-3 active:scale-[0.97] transition-all">
             <div className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center">
-              <Tag size={18} className="text-white/50" />
+              <Tag size={18} className="text-ink-2" />
             </div>
             <span className="text-sm font-bold text-white">Categorías</span>
           </Link>
           <Link to="/reservas" className="card p-4 flex items-center gap-3 active:scale-[0.97] transition-all">
             <div className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center">
-              <BookmarkCheck size={18} className="text-white/50" />
+              <BookmarkCheck size={18} className="text-ink-2" />
             </div>
             <span className="text-sm font-bold text-white">Reservas</span>
           </Link>
           <Link to="/medios" className="card p-4 flex items-center gap-3 active:scale-[0.97] transition-all">
             <div className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center">
-              <Images size={18} className="text-white/50" />
+              <Images size={18} className="text-ink-2" />
             </div>
             <span className="text-sm font-bold text-white">Medios</span>
           </Link>
@@ -107,11 +107,11 @@ export default function DashboardPage() {
             <MonitorPlay size={17} className="text-accent" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-white/40 font-semibold uppercase tracking-wider">Accesos al demo</p>
+            <p className="text-xs text-ink-2 font-semibold uppercase tracking-wider">Accesos al demo</p>
             <p className="text-white font-bold text-sm">
               {demoClicks.total} {demoClicks.total === 1 ? 'vez' : 'veces'}
               {demoClicks.last && (
-                <span className="text-white/30 font-normal ml-2 text-xs">
+                <span className="text-ink-3 font-normal ml-2 text-xs">
                   · último {new Date(demoClicks.last).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                 </span>
               )}
@@ -146,7 +146,7 @@ export default function DashboardPage() {
                 <div className="w-12 h-12 rounded-xl overflow-hidden bg-dark-600 shrink-0">
                   {p.images?.[0]
                     ? <img src={thumbUrl(p.images[0])} alt="" className="w-full h-full object-cover" loading="lazy" onError={thumbFallback(p.images[0])} />
-                    : <div className="w-full h-full flex items-center justify-center text-white/10">
+                    : <div className="w-full h-full flex items-center justify-center text-ink-4">
                       <Package size={20} />
                     </div>
                   }
@@ -154,7 +154,7 @@ export default function DashboardPage() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-white truncate">{p.name}</p>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className={`text-xs font-semibold ${STATUS_COLOR[p.status] || 'text-white/20'}`}>
+                    <span className={`text-xs font-semibold ${STATUS_COLOR[p.status] || 'text-ink-3'}`}>
                       {STATUS_LABEL[p.status] || p.status}
                     </span>
                     {p.regular_price && (
@@ -164,7 +164,7 @@ export default function DashboardPage() {
                     )}
                   </div>
                 </div>
-                <ChevronRight size={15} className="text-white/15 shrink-0" />
+                <ChevronRight size={15} className="text-ink-4 shrink-0" />
               </Link>
             ))
           }

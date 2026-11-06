@@ -63,7 +63,7 @@ export default function MediaPickerModal({ onSelect, onClose, multiple = true })
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-dark" style={{ height: '100dvh' }}>
       {/* Header */}
-      <div className="bg-dark-800 border-b border-white/5 px-4 pt-safe pb-3 shrink-0">
+      <div className="bg-dark-800 border-b border-line px-4 pt-safe pb-3 shrink-0">
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="text-base font-semibold text-white flex items-center gap-2">
@@ -78,21 +78,21 @@ export default function MediaPickerModal({ onSelect, onClose, multiple = true })
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-xl bg-dark-600 border border-white/10 flex items-center justify-center active:scale-90 transition-all"
+            className="w-9 h-9 rounded-xl bg-dark-600 border border-line-2 flex items-center justify-center active:scale-90 transition-all"
           >
-            <X size={17} className="text-white/60" />
+            <X size={17} className="text-ink" />
           </button>
         </div>
 
         {/* Buscador */}
         <div className="relative">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25" />
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
           <input
             type="search"
             placeholder="Buscar imagen..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full bg-dark-700 border border-white/10 rounded-xl pl-8 pr-3 py-2.5 text-sm text-white placeholder-white/20 outline-none focus:border-accent/40 transition-colors"
+            className="w-full bg-dark-700 border border-line-2 rounded-xl pl-8 pr-3 py-2.5 text-sm text-white placeholder-ink-3 outline-none focus:border-accent/40 transition-colors"
           />
         </div>
       </div>
@@ -106,7 +106,7 @@ export default function MediaPickerModal({ onSelect, onClose, multiple = true })
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-16 flex flex-col items-center gap-2 text-white/20">
+          <div className="py-16 flex flex-col items-center gap-2 text-ink-3">
             <Images size={36} strokeWidth={1} />
             <p className="text-sm font-semibold">
               {search ? 'Sin resultados' : 'Biblioteca vacía'}
@@ -119,7 +119,7 @@ export default function MediaPickerModal({ onSelect, onClose, multiple = true })
           </div>
         ) : (
           <>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/20 mb-2 px-1">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-ink-3 mb-2 px-1">
               {filtered.length} imágenes
             </p>
             <div className="grid grid-cols-3 gap-2">
@@ -166,7 +166,7 @@ export default function MediaPickerModal({ onSelect, onClose, multiple = true })
       </div>
 
       {/* Botón confirmar */}
-      <div className="px-4 pb-safe pt-3 bg-dark-800 border-t border-white/5 shrink-0">
+      <div className="px-4 pb-safe pt-3 bg-dark-800 border-t border-line shrink-0">
         <button
           onClick={confirm}
           disabled={selected.size === 0}

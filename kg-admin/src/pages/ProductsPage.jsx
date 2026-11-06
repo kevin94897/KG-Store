@@ -7,7 +7,7 @@ import { thumbUrl, thumbFallback } from '../utils/thumbUrl'
 const STATUS_STYLE = {
   published: 'bg-green-500/10 text-green-400 border-green-500/20',
   draft: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  archived: 'bg-white/5 text-white/20 border-white/5',
+  archived: 'bg-white/5 text-ink-3 border-line',
 }
 const STATUS_LABEL = { published: 'Pub', draft: 'Draft', archived: 'Arc' }
 
@@ -20,7 +20,7 @@ function ProductRow({ product }) {
       <div className="w-14 h-14 rounded-xl overflow-hidden bg-dark-600 shrink-0">
         {product.images?.[0]
           ? <img src={thumbUrl(product.images[0])} alt="" className="w-full h-full object-cover" loading="lazy" onError={thumbFallback(product.images[0])} />
-          : <div className="w-full h-full flex items-center justify-center"><Package size={22} className="text-white/10" /></div>
+          : <div className="w-full h-full flex items-center justify-center"><Package size={22} className="text-ink-4" /></div>
         }
       </div>
       <div className="flex-1 min-w-0">
@@ -39,7 +39,7 @@ function ProductRow({ product }) {
           )}
         </div>
       </div>
-      <ChevronRight size={15} className="text-white/15 shrink-0" />
+      <ChevronRight size={15} className="text-ink-4 shrink-0" />
     </Link>
   )
 }
@@ -109,16 +109,16 @@ export default function ProductsPage() {
   return (
     <div className="min-h-dvh bg-dark pb-24 pt-safe">
       {/* Header */}
-      <div className="sticky top-0 bg-dark/95 backdrop-blur-xl z-10 pt-4 pb-3 border-b border-white/5">
+      <div className="sticky top-0 bg-dark/95 backdrop-blur-xl z-10 pt-4 pb-3 border-b border-line">
         <div className="flex items-center justify-between mb-3">
           <div>
             <h1 className="text-xl font-semibold text-white">Productos</h1>
-            <p className="text-xs text-white/25">{products.length} resultados</p>
+            <p className="text-xs text-ink-3">{products.length} resultados</p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handleRefresh}
-              className="w-9 h-9 bg-dark-600 border border-white/5 rounded-xl flex items-center justify-center text-white/40 active:text-white"
+              className="w-9 h-9 bg-dark-600 border border-line rounded-xl flex items-center justify-center text-ink-2 active:text-white"
             >
               <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
             </button>
@@ -139,7 +139,7 @@ export default function ProductsPage() {
 
         {/* Search */}
         <div className="relative mb-2">
-          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/25" />
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3" />
           <input
             className="input pl-9"
             placeholder="Buscar productos..."
@@ -155,7 +155,7 @@ export default function ProductsPage() {
               key={f.key}
               onClick={() => handleFilter(f.key)}
               className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg transition-all
-                ${filter === f.key ? 'bg-accent text-black' : 'bg-dark-600 text-white/40'}`}
+                ${filter === f.key ? 'bg-accent text-black' : 'bg-dark-600 text-ink-2'}`}
             >
               {f.label}
             </button>
@@ -169,7 +169,7 @@ export default function ProductsPage() {
           : products.length === 0
             ? (
               <div className="text-center py-20">
-                <Package size={40} className="text-white/10 mx-auto mb-3" />
+                <Package size={40} className="text-ink-4 mx-auto mb-3" />
                 <p className="text-white font-semibold">Sin productos</p>
               </div>
             )

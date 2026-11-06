@@ -348,7 +348,7 @@ export default function MediaLibraryPage() {
   return (
     <div className="min-h-dvh bg-dark pb-24 pt-safe">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-dark/95 backdrop-blur-xl border-b border-white/5">
+      <div className="sticky top-0 z-20 bg-dark/95 backdrop-blur-xl border-b border-line">
         <div className="pt-4 pb-3 space-y-3">
           <div className="flex flex-col md:flex-row gap-2 md:items-center justify-between">
             <div>
@@ -370,8 +370,8 @@ export default function MediaLibraryPage() {
                     ${cleanResult?.deleted > 0
                       ? 'bg-green-900/20 border-green-900/40 text-green-400'
                       : cleanResult?.deleted === 0
-                        ? 'bg-dark-600 border-white/10 text-accent/60'
-                        : 'bg-dark-600 border-white/10 text-white/40'
+                        ? 'bg-dark-600 border-line-2 text-accent/60'
+                        : 'bg-dark-600 border-line-2 text-ink-2'
                     }`}
                 >
                   <Trash2 size={15} />
@@ -379,7 +379,7 @@ export default function MediaLibraryPage() {
               )}
               {cleanRunning && (
                 <div className="w-9 h-9 flex items-center justify-center">
-                  <div className="w-4 h-4 border-2 border-white/10 border-t-red-400 rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-line-2 border-t-red-400 rounded-full animate-spin" />
                 </div>
               )}
               {/* Migración de variantes */}
@@ -391,8 +391,8 @@ export default function MediaLibraryPage() {
                     ${migDone
                       ? 'bg-green-900/20 border-green-900/40 text-green-400'
                       : migPlan !== null && migPlan.missingThumb.length === 0 && migPlan.missingMedium.length === 0 && migPlan.heavyWeb.length === 0
-                        ? 'bg-dark-600 border-white/10 text-accent/60'
-                        : 'bg-dark-600 border-white/10 text-white/40'
+                        ? 'bg-dark-600 border-line-2 text-accent/60'
+                        : 'bg-dark-600 border-line-2 text-ink-2'
                     }`}
                 >
                   <Wand2 size={15} />
@@ -401,7 +401,7 @@ export default function MediaLibraryPage() {
               {/* Toggle columnas */}
               <button
                 onClick={() => setCols(c => c === 3 ? 2 : 3)}
-                className="w-9 h-9 rounded-xl bg-dark-600 border border-white/10 flex items-center justify-center text-white/40 active:scale-90 transition-all"
+                className="w-9 h-9 rounded-xl bg-dark-600 border border-line-2 flex items-center justify-center text-ink-2 active:scale-90 transition-all"
               >
                 {cols === 3 ? <Grid2X2 size={16} /> : <Grid3X3 size={16} />}
               </button>
@@ -415,7 +415,7 @@ export default function MediaLibraryPage() {
                 className={`px-3 h-9 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all active:scale-95
                   ${selectMode
                     ? 'bg-accent text-black border-accent'
-                    : 'bg-dark-600 text-white/50 border-white/10'
+                    : 'bg-dark-600 text-ink-2 border-line-2'
                   }`}
               >
                 {selectMode ? 'Cancelar' : 'Seleccionar'}
@@ -425,13 +425,13 @@ export default function MediaLibraryPage() {
 
           {/* Buscador */}
           <div className="relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
             <input
               type="search"
               placeholder="Buscar por nombre..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full bg-dark-700 border border-white/10 rounded-xl pl-9 pr-3 py-2.5 text-sm text-white placeholder-white/20 outline-none focus:border-accent/40 transition-colors"
+              className="w-full bg-dark-700 border border-line-2 rounded-xl pl-9 pr-3 py-2.5 text-sm text-white placeholder-ink-3 outline-none focus:border-accent/40 transition-colors"
             />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -445,7 +445,7 @@ export default function MediaLibraryPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleAll}
-                className="flex items-center gap-2 text-xs text-white/50 font-semibold px-3 py-2 rounded-xl bg-dark-600 border border-white/10 active:scale-95 transition-all"
+                className="flex items-center gap-2 text-xs text-ink-2 font-semibold px-3 py-2 rounded-xl bg-dark-600 border border-line-2 active:scale-95 transition-all"
               >
                 {selected.size === filtered.length && filtered.length > 0
                   ? <CheckSquare size={14} className="text-accent" />
@@ -476,22 +476,22 @@ export default function MediaLibraryPage() {
           className={`border-2 border-dashed rounded-2xl py-4 flex items-center gap-4 px-4 transition-all cursor-pointer
             ${dragOver
               ? 'border-accent bg-accent/5 scale-[1.01]'
-              : 'border-white/10 bg-dark-700/30'
+              : 'border-line-2 bg-dark-700/30'
             }
             ${uploading ? 'opacity-60 pointer-events-none' : ''}
           `}
           onClick={() => !uploading && fileRef.current?.click()}
         >
-          <div className="w-12 h-12 rounded-xl bg-dark-600 border border-white/10 flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-dark-600 border border-line-2 flex items-center justify-center shrink-0">
             {uploading
-              ? <div className="w-5 h-5 border-2 border-white/10 border-t-accent rounded-full animate-spin" />
+              ? <div className="w-5 h-5 border-2 border-line-2 border-t-accent rounded-full animate-spin" />
               : <Upload size={20} className="text-white" />
             }
           </div>
           <div className="flex-1 min-w-0">
             {uploading ? (
               <div className="space-y-1.5">
-                <p className="text-sm font-semibold text-white/60">Subiendo... {progress}%</p>
+                <p className="text-sm font-semibold text-ink">Subiendo... {progress}%</p>
                 <div className="h-1.5 bg-dark-500 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-accent rounded-full transition-all duration-200"
@@ -501,10 +501,10 @@ export default function MediaLibraryPage() {
               </div>
             ) : (
               <>
-                <p className="text-sm font-bold text-white/60">
+                <p className="text-sm font-bold text-ink">
                   {dragOver ? '¡Suelta aquí!' : 'Subir imágenes'}
                 </p>
-                <p className="text-xs text-white/25 mt-0.5">
+                <p className="text-xs text-ink-3 mt-0.5">
                   Arrastra o toca · Optimizado automáticamente a WebP
                 </p>
               </>
@@ -515,7 +515,7 @@ export default function MediaLibraryPage() {
             <button
               type="button"
               onClick={e => { e.stopPropagation(); cameraRef.current?.click() }}
-              className="w-10 h-10 rounded-xl bg-dark-600 border border-white/10 flex items-center justify-center text-white active:border-accent/60 active:text-accent transition-all shrink-0"
+              className="w-10 h-10 rounded-xl bg-dark-600 border border-line-2 flex items-center justify-center text-white active:border-accent/60 active:text-accent transition-all shrink-0"
             >
               <Camera size={18} />
             </button>
@@ -526,9 +526,9 @@ export default function MediaLibraryPage() {
       {/* Banner limpieza de duplicados */}
       {cleanResult && (
         <div className="pt-3">
-          <div className={`flex items-center gap-2.5 rounded-2xl px-4 py-3 ${cleanResult.error ? 'bg-red-900/20 border border-red-900/40' : 'bg-dark-700 border border-white/10'}`}>
-            <Trash2 size={15} className={cleanResult.error ? 'text-red-400 shrink-0' : 'text-white/40 shrink-0'} />
-            <p className={`text-sm flex-1 ${cleanResult.error ? 'text-red-400' : 'text-white/60'}`}>
+          <div className={`flex items-center gap-2.5 rounded-2xl px-4 py-3 ${cleanResult.error ? 'bg-red-900/20 border border-red-900/40' : 'bg-dark-700 border border-line-2'}`}>
+            <Trash2 size={15} className={cleanResult.error ? 'text-red-400 shrink-0' : 'text-ink-2 shrink-0'} />
+            <p className={`text-sm flex-1 ${cleanResult.error ? 'text-red-400' : 'text-ink'}`}>
               {cleanResult.error
                 ? `Error: ${cleanResult.error}`
                 : cleanResult.deleted === 0
@@ -536,7 +536,7 @@ export default function MediaLibraryPage() {
                   : `${cleanResult.deleted} duplicado${cleanResult.deleted !== 1 ? 's' : ''} eliminado${cleanResult.deleted !== 1 ? 's' : ''}`
               }
             </p>
-            <button onClick={() => setCleanResult(null)} className="text-white/20 active:text-white/50">
+            <button onClick={() => setCleanResult(null)} className="text-ink-3 active:text-ink-2">
               <X size={14} />
             </button>
           </div>
@@ -558,20 +558,20 @@ export default function MediaLibraryPage() {
                 </p>
               </div>
               <button onClick={() => { setMigDone(false); setMigPlan(null) }}
-                className="text-white/20 active:text-white/50 transition-colors">
+                className="text-ink-3 active:text-ink-2 transition-colors">
                 <X size={15} />
               </button>
             </div>
           )}
 
           {migRunning && (
-            <div className="bg-dark-700 border border-white/10 rounded-2xl px-4 py-3 space-y-2">
+            <div className="bg-dark-700 border border-line-2 rounded-2xl px-4 py-3 space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Wand2 size={14} className="text-accent animate-pulse" />
                   <span className="text-sm font-bold text-white">Optimizando imágenes...</span>
                 </div>
-                <span className="text-xs font-mono text-white/40">
+                <span className="text-xs font-mono text-ink-2">
                   {migProgress.done}/{migProgress.total}
                 </span>
               </div>
@@ -598,7 +598,7 @@ export default function MediaLibraryPage() {
             ]).size
             const allOk = total === 0
             return (
-              <div className="bg-dark-700 border border-white/10 rounded-2xl px-4 py-3 space-y-2.5">
+              <div className="bg-dark-700 border border-line-2 rounded-2xl px-4 py-3 space-y-2.5">
                 <div className="flex items-start gap-3">
                   <Wand2 size={16} className={`shrink-0 mt-0.5 ${allOk ? 'text-accent/50' : 'text-accent'}`} />
                   <div className="flex-1 min-w-0">
@@ -607,9 +607,9 @@ export default function MediaLibraryPage() {
                     </p>
                     {!allOk && (
                       <div className="mt-1.5 space-y-0.5">
-                        {totalThumb > 0 && <p className="text-xs text-white/40">· {totalThumb} sin thumbnail (admin)</p>}
-                        {totalMedium > 0 && <p className="text-xs text-white/40">· {totalMedium} sin medium (tienda)</p>}
-                        {totalHeavy > 0 && <p className="text-xs text-white/40">· {totalHeavy} con peso {'>'} 300 KB</p>}
+                        {totalThumb > 0 && <p className="text-xs text-ink-2">· {totalThumb} sin thumbnail (admin)</p>}
+                        {totalMedium > 0 && <p className="text-xs text-ink-2">· {totalMedium} sin medium (tienda)</p>}
+                        {totalHeavy > 0 && <p className="text-xs text-ink-2">· {totalHeavy} con peso {'>'} 300 KB</p>}
                       </div>
                     )}
                   </div>
@@ -637,7 +637,7 @@ export default function MediaLibraryPage() {
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-16 flex flex-col items-center gap-3 text-white/20">
+          <div className="py-16 flex flex-col items-center gap-3 text-ink-3">
             <Img size={40} strokeWidth={1} />
             <p className="text-sm font-semibold">
               {search ? 'Sin resultados' : 'No hay imágenes aún'}
@@ -650,7 +650,7 @@ export default function MediaLibraryPage() {
           </div>
         ) : (
           <>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/20 mb-3">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-ink-3 mb-3">
               {filtered.length} {filtered.length === 1 ? 'imagen' : 'imágenes'}
               {search && ` encontradas`}
             </p>
@@ -681,7 +681,7 @@ export default function MediaLibraryPage() {
                     />
                     {/* Overlay tamaño */}
                     {!selectMode && (
-                      <div className="absolute bottom-1 right-1 bg-black/60 text-white/70 text-[9px] font-mono px-1.5 py-0.5 rounded-md">
+                      <div className="absolute bottom-1 right-1 bg-black/60 text-ink text-[9px] font-mono px-1.5 py-0.5 rounded-md">
                         {fmtSize(file.metadata?.size)}
                       </div>
                     )}
@@ -723,7 +723,7 @@ export default function MediaLibraryPage() {
         <div className="flex justify-center mt-6">
           <button
             onClick={loadFiles}
-            className="flex items-center gap-2 text-xs text-white/25 font-semibold px-4 py-2 rounded-xl bg-dark-700 border border-white/5 active:scale-95 transition-all"
+            className="flex items-center gap-2 text-xs text-ink-3 font-semibold px-4 py-2 rounded-xl bg-dark-700 border border-line active:scale-95 transition-all"
           >
             <RefreshCw size={12} /> Recargar
           </button>
@@ -733,7 +733,7 @@ export default function MediaLibraryPage() {
       {/* Modal confirmación borrar */}
       {confirmDelete && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end p-4">
-          <div className="w-full bg-dark-800 border border-white/10 rounded-2xl p-5 space-y-4">
+          <div className="w-full bg-dark-800 border border-line-2 rounded-2xl p-5 space-y-4">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-xl bg-red-900/30 border border-red-900/50 flex items-center justify-center shrink-0">
                 <AlertTriangle size={18} className="text-red-400" />
@@ -742,7 +742,7 @@ export default function MediaLibraryPage() {
                 <p className="font-bold text-white">
                   ¿Eliminar {selected.size} {selected.size === 1 ? 'imagen' : 'imágenes'}?
                 </p>
-                <p className="text-sm text-white/40 mt-1 leading-relaxed">
+                <p className="text-sm text-ink-2 mt-1 leading-relaxed">
                   Esta acción es permanente y no se puede deshacer. Los productos que usen estas imágenes perderán sus fotos.
                 </p>
               </div>
@@ -751,7 +751,7 @@ export default function MediaLibraryPage() {
               <button
                 onClick={() => setConfirmDelete(false)}
                 disabled={deleting}
-                className="flex-1 py-3 rounded-xl bg-dark-600 border border-white/10 text-white/60 font-semibold text-sm active:scale-95 transition-all disabled:opacity-40"
+                className="flex-1 py-3 rounded-xl bg-dark-600 border border-line-2 text-ink font-semibold text-sm active:scale-95 transition-all disabled:opacity-40"
               >
                 Cancelar
               </button>
@@ -780,7 +780,7 @@ export default function MediaLibraryPage() {
           <div className="flex items-center justify-between px-4 pt-safe py-3 shrink-0">
             <div className="min-w-0">
               <p className="text-white font-semibold text-sm truncate">{lightbox.name}</p>
-              <p className="text-white/40 text-xs">{fmtSize(lightbox.size)}</p>
+              <p className="text-ink-2 text-xs">{fmtSize(lightbox.size)}</p>
             </div>
             <button
               onClick={() => setLightbox(null)}

@@ -34,10 +34,10 @@ function InfoRow({ icon: Icon, label, value }) {
   if (!value) return null
   return (
     <div className="flex items-start gap-2.5">
-      <Icon size={14} className="text-white/25 mt-0.5 shrink-0" />
+      <Icon size={14} className="text-ink-3 mt-0.5 shrink-0" />
       <div>
-        <p className="text-[10px] text-white/25 uppercase tracking-widest font-bold">{label}</p>
-        <p className="text-white/70 text-sm">{value}</p>
+        <p className="text-[10px] text-ink-3 uppercase tracking-widest font-bold">{label}</p>
+        <p className="text-ink text-sm">{value}</p>
       </div>
     </div>
   )
@@ -100,7 +100,7 @@ export default function UserDetailPage() {
 
   if (!profile) return (
     <div className="pt-6 pb-24 text-center">
-      <p className="text-white/30">Usuario no encontrado</p>
+      <p className="text-ink-3">Usuario no encontrado</p>
       <button onClick={() => navigate('/usuarios')} className="text-accent text-sm mt-2">← Volver</button>
     </div>
   )
@@ -114,7 +114,7 @@ export default function UserDetailPage() {
       {/* Volver */}
       <button
         onClick={() => navigate('/usuarios')}
-        className="flex items-center gap-2 text-white/40 hover:text-white text-sm mb-6 transition-colors"
+        className="flex items-center gap-2 text-ink-2 hover:text-white text-sm mb-6 transition-colors"
       >
         <ArrowLeft size={15} /> Usuarios
       </button>
@@ -124,14 +124,14 @@ export default function UserDetailPage() {
         <Avatar profile={profile} />
         <div className="flex-1 min-w-0">
           <h1 className="text-lg font-bold text-white truncate">
-            {profile.full_name || <span className="text-white/30 italic font-normal">Sin nombre</span>}
+            {profile.full_name || <span className="text-ink-3 italic font-normal">Sin nombre</span>}
           </h1>
-          <p className="text-white/40 text-sm truncate">{profile.user_email}</p>
+          <p className="text-ink-2 text-sm truncate">{profile.user_email}</p>
         </div>
       </div>
 
       {/* Datos del perfil */}
-      <div className="bg-[#111111] border border-white/5 rounded-2xl p-4 mb-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="bg-surface border border-line rounded-2xl p-4 mb-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
         <InfoRow icon={User}     label="Nombre"    value={profile.full_name} />
         <InfoRow icon={Mail}     label="Email"     value={profile.user_email} />
         <InfoRow icon={Phone}    label="Teléfono"  value={profile.phone} />
@@ -140,22 +140,22 @@ export default function UserDetailPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3 mb-5">
-        <div className="bg-[#111111] border border-white/5 rounded-2xl p-4 flex items-center gap-3">
+        <div className="bg-surface border border-line rounded-2xl p-4 flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-yellow-500/10 flex items-center justify-center">
             <BookmarkCheck size={16} className="text-yellow-400" />
           </div>
           <div>
             <p className="text-2xl font-bold text-white">{reservations.length}</p>
-            <p className="text-white/30 text-xs">Reserva{reservations.length !== 1 ? 's' : ''}</p>
+            <p className="text-ink-3 text-xs">Reserva{reservations.length !== 1 ? 's' : ''}</p>
           </div>
         </div>
-        <div className="bg-[#111111] border border-white/5 rounded-2xl p-4 flex items-center gap-3">
+        <div className="bg-surface border border-line rounded-2xl p-4 flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-red-500/10 flex items-center justify-center">
             <Heart size={16} className="text-red-400" />
           </div>
           <div>
             <p className="text-2xl font-bold text-white">{favorites.length}</p>
-            <p className="text-white/30 text-xs">Favorito{favorites.length !== 1 ? 's' : ''}</p>
+            <p className="text-ink-3 text-xs">Favorito{favorites.length !== 1 ? 's' : ''}</p>
           </div>
         </div>
       </div>
@@ -172,13 +172,13 @@ export default function UserDetailPage() {
             className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold border transition-all
               ${tab === t.key
                 ? 'bg-accent text-black border-accent'
-                : 'bg-white/5 text-white/50 border-white/8 hover:border-white/20'}`}
+                : 'bg-white/5 text-ink-2 border-line hover:border-white/20'}`}
           >
             <t.icon size={12} />
             {t.label}
             {t.count > 0 && (
               <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full
-                ${tab === t.key ? 'bg-black/20 text-black' : 'bg-white/10 text-white/40'}`}>
+                ${tab === t.key ? 'bg-black/20 text-black' : 'bg-white/10 text-ink-2'}`}>
                 {t.count}
               </span>
             )}
@@ -191,15 +191,15 @@ export default function UserDetailPage() {
         <div className="space-y-2">
           {reservations.length === 0 ? (
             <div className="text-center py-10">
-              <BookmarkCheck size={28} className="text-white/10 mx-auto mb-2" />
-              <p className="text-white/25 text-sm">Sin reservas</p>
+              <BookmarkCheck size={28} className="text-ink-4 mx-auto mb-2" />
+              <p className="text-ink-3 text-sm">Sin reservas</p>
             </div>
           ) : reservations.map(res => (
-            <div key={res.id} className="bg-[#111111] border border-white/5 rounded-2xl p-4">
+            <div key={res.id} className="bg-surface border border-line rounded-2xl p-4">
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex-1 min-w-0">
                   <p className="text-white text-sm font-semibold truncate">{res.product_name}</p>
-                  <p className="text-white/30 text-xs mt-0.5">
+                  <p className="text-ink-3 text-xs mt-0.5">
                     {new Date(res.created_at).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' })}
                     {' · '}{METHOD_LABEL[res.payment_method] || res.payment_method}
                   </p>
@@ -218,7 +218,7 @@ export default function UserDetailPage() {
                   href={res.payment_proof_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-white/40 hover:text-accent transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs text-ink-2 hover:text-accent transition-colors"
                 >
                   <ExternalLink size={12} /> Ver comprobante
                 </a>
@@ -233,8 +233,8 @@ export default function UserDetailPage() {
         <div>
           {favorites.length === 0 ? (
             <div className="text-center py-10">
-              <Heart size={28} className="text-white/10 mx-auto mb-2" />
-              <p className="text-white/25 text-sm">Sin favoritos</p>
+              <Heart size={28} className="text-ink-4 mx-auto mb-2" />
+              <p className="text-ink-3 text-sm">Sin favoritos</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
@@ -243,7 +243,7 @@ export default function UserDetailPage() {
                 if (!p) return null
                 const price = p.sale_price || p.regular_price
                 return (
-                  <div key={fav.id} className="bg-[#111111] border border-white/5 rounded-2xl overflow-hidden">
+                  <div key={fav.id} className="bg-surface border border-line rounded-2xl overflow-hidden">
                     {p.images?.[0] && (
                       <div className="aspect-square bg-black overflow-hidden">
                         <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" />
@@ -264,7 +264,7 @@ export default function UserDetailPage() {
                             href={`/producto/${p.slug}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-white/20 hover:text-accent transition-colors"
+                            className="text-ink-3 hover:text-accent transition-colors"
                           >
                             <ExternalLink size={11} />
                           </a>

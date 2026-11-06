@@ -56,7 +56,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPass(p => !p)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25 active:text-white/60"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-3 active:text-ink"
               >
                 {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -81,7 +81,7 @@ export default function LoginPage() {
 
         <div className="relative flex items-center gap-3">
           <div className="flex-1 h-px bg-white/8" />
-          <span className="text-white/20 text-xs">o</span>
+          <span className="text-ink-3 text-xs">o</span>
           <div className="flex-1 h-px bg-white/8" />
         </div>
 
@@ -99,7 +99,7 @@ export default function LoginPage() {
           Ver demo del panel
         </button>
 
-        <p className="text-center text-xs text-white/20">
+        <p className="text-center text-xs text-ink-3">
           Usa tus credenciales de Supabase Auth
         </p>
       </div>

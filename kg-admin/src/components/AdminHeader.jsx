@@ -23,7 +23,7 @@ export default function AdminHeader() {
 
   return (
     <>
-      <header className="fixed top-0 inset-x-0 z-50 bg-dark-800/95 backdrop-blur-xl border-b border-white/5 pt-safe">
+      <header className="fixed top-0 inset-x-0 z-50 bg-black backdrop-blur-xl border-b border-line pt-safe">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
 
           {/* Logo */}
@@ -51,7 +51,7 @@ export default function AdminHeader() {
               <div className="w-7 h-7 rounded-full bg-accent/20 border border-accent/25 flex items-center justify-center font-bold text-accent text-[11px]">
                 {initials}
               </div>
-              <span className="text-sm text-white/60 font-medium max-w-[100px] truncate hidden sm:block">
+              <span className="text-sm text-ink font-medium max-w-[100px] truncate hidden sm:block">
                 {displayName}
               </span>
             </button>

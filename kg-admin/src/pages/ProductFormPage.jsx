@@ -23,14 +23,14 @@ const slugify = s => s.toLowerCase()
 function Toggle({ label, sub, value, onChange }) {
   return (
     <button type="button" onClick={() => onChange(!value)}
-      className="w-full flex items-center justify-between px-4 py-3 bg-dark-700 rounded-xl border border-white/5">
+      className="w-full flex items-center justify-between px-4 py-3 bg-dark-700 rounded-xl border border-line">
       <div>
         <p className="text-sm text-white font-semibold">{label}</p>
         {sub && <p className="text-xs text-white mt-0.5">{sub}</p>}
       </div>
       {value
         ? <ToggleRight size={26} className="text-accent shrink-0" />
-        : <ToggleLeft size={26} className="text-white/15 shrink-0" />
+        : <ToggleLeft size={26} className="text-ink-4 shrink-0" />
       }
     </button>
   )
@@ -164,17 +164,17 @@ export default function ProductFormPage() {
 
   if (loading) return (
     <div className="min-h-dvh bg-dark flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-white/10 border-t-accent rounded-full animate-spin" />
+      <div className="w-8 h-8 border-2 border-line-2 border-t-accent rounded-full animate-spin" />
     </div>
   )
 
   return (
     <div className="min-h-dvh bg-dark pb-36 pt-safe">
       {/* Header */}
-      <div className="sticky top-0 bg-dark/95 backdrop-blur-xl z-10 pt-4 pb-3 border-b border-white/5">
+      <div className="sticky top-0 bg-dark/95 backdrop-blur-xl z-10 pt-4 pb-3 border-b border-line">
         <div className="flex items-center gap-3 mb-3">
           <button onClick={() => navigate(-1)}
-            className="w-9 h-9 bg-dark-600 border border-white/5 rounded-xl flex items-center justify-center text-white/50 active:text-white shrink-0">
+            className="w-9 h-9 bg-dark-600 border border-line rounded-xl flex items-center justify-center text-ink-2 active:text-white shrink-0">
             <ArrowLeft size={18} />
           </button>
           <h1 className="flex-1 text-lg font-semibold text-white truncate">
@@ -193,7 +193,7 @@ export default function ProductFormPage() {
           {TABS.map(t => (
             <button key={t} onClick={() => setSection(t)}
               className={`shrink-0 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg transition-all capitalize
-                ${section === t ? 'bg-accent text-black' : 'bg-dark-600 text-white/35'}`}>
+                ${section === t ? 'bg-accent text-black' : 'bg-dark-600 text-ink-3'}`}>
               {t}
             </button>
           ))}
@@ -260,7 +260,7 @@ export default function ProductFormPage() {
                   <option value="draft">📝 Borrador</option>
                   <option value="archived">📦 Archivado</option>
                 </select>
-                <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none" />
+                <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-3 pointer-events-none" />
               </div>
             </div>
             <Toggle label="Destacado" sub="Aparece en sección destacados" value={form.featured} onChange={v => set('featured', v)} />
@@ -273,7 +273,7 @@ export default function ProductFormPage() {
             <div>
               <label className="label">Precio regular</label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/25 text-sm font-mono">S/</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-3 text-sm font-mono">S/</span>
                 <input className="input pl-9 font-mono" type="number" inputMode="decimal" placeholder="0.00"
                   value={form.regular_price} onChange={e => set('regular_price', e.target.value)} />
               </div>
@@ -281,7 +281,7 @@ export default function ProductFormPage() {
             <div>
               <label className="label">Precio de oferta</label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/25 text-sm font-mono">S/</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-3 text-sm font-mono">S/</span>
                 <input className="input pl-9 font-mono" type="number" inputMode="decimal" placeholder="0.00 (opcional)"
                   value={form.sale_price} onChange={e => set('sale_price', e.target.value)} />
               </div>
@@ -307,7 +307,7 @@ export default function ProductFormPage() {
                   <option value="variable">Variable</option>
                   <option value="grouped">Agrupado</option>
                 </select>
-                <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none" />
+                <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-3 pointer-events-none" />
               </div>
             </div>
           </div>
@@ -316,7 +316,7 @@ export default function ProductFormPage() {
         {/* ── IMÁGENES ── */}
         {section === 'imágenes' && (
           <div className="fade-up">
-            <p className="text-xs text-white/25 mb-3">
+            <p className="text-xs text-ink-3 mb-3">
               La primera imagen será la principal.
             </p>
             <ImageUploader images={form.images} onChange={imgs => set('images', imgs)} />
@@ -331,7 +331,7 @@ export default function ProductFormPage() {
               return (
                 <button key={cat.id} type="button" onClick={() => set('category_id', selected ? '' : cat.id)}
                   className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border transition-all active:scale-[0.98]
-                    ${selected ? 'bg-accent/10 border-accent/30 text-accent' : 'bg-dark-700 border-white/5 text-white/60'}`}>
+                    ${selected ? 'bg-accent/10 border-accent/30 text-accent' : 'bg-dark-700 border-line text-ink'}`}>
                   <span className="font-semibold text-sm">{cat.name}</span>
                   {selected && <Check size={16} />}
                 </button>

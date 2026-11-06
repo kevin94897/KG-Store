@@ -194,36 +194,36 @@ export default function ImageUploader({ images = [], onChange }) {
       )}
 
       {images.length > 0 && selectedIdx === null && (
-        <p className="text-center text-white/20 text-xs">Toca una imagen para ver opciones</p>
+        <p className="text-center text-ink-3 text-xs">Toca una imagen para ver opciones</p>
       )}
 
       <div className="grid grid-cols-3 gap-3">
         <button type="button" onClick={() => cameraRef.current?.click()} disabled={uploading}
-          className="border-2 border-dashed border-white/10 rounded-2xl py-5 flex flex-col items-center gap-2.5 text-white/40 text-xs font-bold uppercase tracking-wider active:border-accent/60 active:text-accent active:bg-accent/5 transition-all disabled:opacity-40">
+          className="border-2 border-dashed border-line-2 rounded-2xl py-5 flex flex-col items-center gap-2.5 text-ink-2 text-xs font-bold uppercase tracking-wider active:border-accent/60 active:text-accent active:bg-accent/5 transition-all disabled:opacity-40">
           <Camera size={26} /><span>Cámara</span>
         </button>
         <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
-          className="border-2 border-dashed border-white/10 rounded-2xl py-5 flex flex-col items-center gap-2.5 text-white/40 text-xs font-bold uppercase tracking-wider active:border-accent/60 active:text-accent active:bg-accent/5 transition-all disabled:opacity-40">
+          className="border-2 border-dashed border-line-2 rounded-2xl py-5 flex flex-col items-center gap-2.5 text-ink-2 text-xs font-bold uppercase tracking-wider active:border-accent/60 active:text-accent active:bg-accent/5 transition-all disabled:opacity-40">
           <Img size={26} /><span>Galería</span>
         </button>
         <button type="button" onClick={() => setShowMediaPicker(true)} disabled={uploading}
-          className="border-2 border-dashed border-white/10 rounded-2xl py-5 flex flex-col items-center gap-2.5 text-white/40 text-xs font-bold uppercase tracking-wider active:border-accent/60 active:text-accent active:bg-accent/5 transition-all disabled:opacity-40">
+          className="border-2 border-dashed border-line-2 rounded-2xl py-5 flex flex-col items-center gap-2.5 text-ink-2 text-xs font-bold uppercase tracking-wider active:border-accent/60 active:text-accent active:bg-accent/5 transition-all disabled:opacity-40">
           <Images size={26} /><span>Medios</span>
         </button>
       </div>
 
       <div className="space-y-2">
-        <p className="text-[11px] font-bold uppercase tracking-widest text-white/20">Pegar imagen</p>
+        <p className="text-[11px] font-bold uppercase tracking-widest text-ink-3">Pegar imagen</p>
         {pasteSupported && (
           <button type="button" onClick={handlePasteButton} disabled={uploading}
             className={`w-full border-2 border-dashed rounded-2xl py-4 flex items-center justify-center gap-2.5 text-sm font-bold transition-all disabled:opacity-40
-              ${pasteFlash ? 'border-accent bg-accent/10 text-accent' : 'border-white/10 text-white/40 active:border-accent/60 active:text-accent active:bg-accent/5'}`}>
+              ${pasteFlash ? 'border-accent bg-accent/10 text-accent' : 'border-line-2 text-ink-2 active:border-accent/60 active:text-accent active:bg-accent/5'}`}>
             <Clipboard size={20} />{pasteFlash ? '¡Pegado!' : 'Pegar imagen copiada'}
           </button>
         )}
         {!pasteSupported && !showUrlInput && (
           <button type="button" onClick={() => setShowUrlInput(true)}
-            className="w-full border-2 border-dashed border-white/10 rounded-2xl py-4 flex items-center justify-center gap-2.5 text-sm font-bold text-white/40 active:border-accent/60 active:text-accent active:bg-accent/5 transition-all">
+            className="w-full border-2 border-dashed border-line-2 rounded-2xl py-4 flex items-center justify-center gap-2.5 text-sm font-bold text-ink-2 active:border-accent/60 active:text-accent active:bg-accent/5 transition-all">
             <Clipboard size={20} />Pegar URL de imagen
           </button>
         )}
@@ -232,9 +232,9 @@ export default function ImageUploader({ images = [], onChange }) {
             <input autoFocus type="url" inputMode="url" placeholder="https://..."
               value={urlInput} onChange={e => setUrlInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleUrlAdd()}
-              className="flex-1 bg-dark-700 border border-white/10 rounded-xl px-3 py-3 text-sm text-white placeholder-white/20 outline-none focus:border-accent/50" />
+              className="flex-1 bg-dark-700 border border-line-2 rounded-xl px-3 py-3 text-sm text-white placeholder-ink-3 outline-none focus:border-accent/50" />
             <button type="button" onClick={handleUrlAdd} className="bg-accent text-black font-bold px-4 rounded-xl active:scale-95 transition-all"><Check size={18} /></button>
-            <button type="button" onClick={() => { setShowUrlInput(false); setUrlInput('') }} className="bg-dark-600 text-white/40 px-3 rounded-xl active:scale-95 transition-all"><X size={18} /></button>
+            <button type="button" onClick={() => { setShowUrlInput(false); setUrlInput('') }} className="bg-dark-600 text-ink-2 px-3 rounded-xl active:scale-95 transition-all"><X size={18} /></button>
           </div>
         )}
       </div>

@@ -47,18 +47,18 @@ function OrderCard({ order, onUpdate }) {
             {order.total && <span className="text-accent font-bold">S/{parseFloat(order.total).toFixed(2)}</span>}
           </div>
         </div>
-        <ChevronRight size={16} className={`text-white/15 transition-transform ${open ? 'rotate-90' : ''}`} />
+        <ChevronRight size={16} className={`text-ink-4 transition-transform ${open ? 'rotate-90' : ''}`} />
       </button>
 
       {open && (
-        <div className="px-4 pb-4 space-y-3 border-t border-white/5 pt-3 fade-in">
-          {order.customer_email && <p className="text-xs text-white/40">{order.customer_email}</p>}
+        <div className="px-4 pb-4 space-y-3 border-t border-line pt-3 fade-in">
+          {order.customer_email && <p className="text-xs text-ink-2">{order.customer_email}</p>}
           {order.customer_phone && (
             <a href={`https://wa.me/${order.customer_phone}`} className="text-xs text-green-400 flex items-center gap-1">
               📱 {order.customer_phone}
             </a>
           )}
-          {order.notes && <p className="text-xs text-white/50 bg-dark-600 rounded-xl p-3">{order.notes}</p>}
+          {order.notes && <p className="text-xs text-ink-2 bg-dark-600 rounded-xl p-3">{order.notes}</p>}
 
           {/* Status change */}
           <div>
@@ -74,7 +74,7 @@ function OrderCard({ order, onUpdate }) {
                   <option key={k} value={k}>{v}</option>
                 ))}
               </select>
-              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none" />
+              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-3 pointer-events-none" />
             </div>
           </div>
         </div>
@@ -141,11 +141,11 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-dvh bg-dark pb-24 pt-safe">
-      <div className="sticky top-0 bg-dark/95 backdrop-blur-xl z-10 px-4 pt-5 pb-3 border-b border-white/5">
+      <div className="sticky top-0 bg-dark/95 backdrop-blur-xl z-10 px-4 pt-5 pb-3 border-b border-line">
         <div className="flex items-center justify-between mb-3">
           <div>
             <h1 className="text-xl font-semibold text-white">Pedidos</h1>
-            <p className="text-xs text-white/25">{orders.length} en total</p>
+            <p className="text-xs text-ink-3">{orders.length} en total</p>
           </div>
           <button
             onClick={() => setShowForm(p => !p)}
@@ -158,7 +158,7 @@ export default function OrdersPage() {
           {FILTERS.map(f => (
             <button key={f.key} onClick={() => setFilter(f.key)}
               className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg transition-all
-                ${filter === f.key ? 'bg-accent text-black' : 'bg-dark-600 text-white/35'}`}>
+                ${filter === f.key ? 'bg-accent text-black' : 'bg-dark-600 text-ink-3'}`}>
               {f.label}
             </button>
           ))}
@@ -178,8 +178,8 @@ export default function OrdersPage() {
           : filtered.length === 0
             ? (
               <div className="text-center py-16">
-                <ShoppingCart size={40} className="text-white/10 mx-auto mb-3" />
-                <p className="text-white/25 text-sm">Sin pedidos</p>
+                <ShoppingCart size={40} className="text-ink-4 mx-auto mb-3" />
+                <p className="text-ink-3 text-sm">Sin pedidos</p>
               </div>
             )
             : filtered.map(o => <OrderCard key={o.id} order={o} onUpdate={load} />)

@@ -43,12 +43,12 @@ export default function AdminProfileModal({ onClose }) {
       style={{ background: 'rgba(0,0,0,0.70)', backdropFilter: 'blur(6px)' }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="w-full max-w-sm bg-[#111111] rounded-3xl shadow-2xl fade-in">
+      <div className="w-full max-w-sm bg-surface rounded-3xl shadow-2xl fade-in">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-white/5">
+        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-line">
           <h2 className="text-sm font-bold text-white">Mi perfil</h2>
-          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white transition-colors">
+          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-full bg-white/5 text-ink-2 hover:text-white transition-colors">
             <X size={14} />
           </button>
         </div>
@@ -61,50 +61,50 @@ export default function AdminProfileModal({ onClose }) {
             </div>
             <div>
               <p className="text-white text-sm font-semibold">{form.full_name || 'Administrador'}</p>
-              <p className="text-white/40 text-xs">{user?.email}</p>
+              <p className="text-ink-2 text-xs">{user?.email}</p>
             </div>
           </div>
 
           {/* Nombre */}
           <div>
-            <label className="text-[10px] text-white/30 uppercase tracking-widest font-bold block mb-1.5">Nombre</label>
+            <label className="text-[10px] text-ink-3 uppercase tracking-widest font-bold block mb-1.5">Nombre</label>
             <div className="relative">
-              <User size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25" />
+              <User size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
               <input
                 type="text"
                 value={form.full_name}
                 onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
                 placeholder="Tu nombre completo"
-                className="w-full bg-dark-700 border border-white/8 rounded-xl pl-8 pr-4 py-2.5 text-sm text-white placeholder-white/20 outline-none focus:border-accent/50 transition-colors"
+                className="w-full bg-dark-700 border border-line rounded-xl pl-8 pr-4 py-2.5 text-sm text-white placeholder-ink-3 outline-none focus:border-accent/50 transition-colors"
               />
             </div>
           </div>
 
           {/* Email (solo lectura) */}
           <div>
-            <label className="text-[10px] text-white/30 uppercase tracking-widest font-bold block mb-1.5">Email</label>
+            <label className="text-[10px] text-ink-3 uppercase tracking-widest font-bold block mb-1.5">Email</label>
             <div className="relative">
-              <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25" />
+              <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
               <input
                 type="email"
                 value={user?.email || ''}
                 disabled
-                className="w-full bg-dark-600/50 border border-white/5 rounded-xl pl-8 pr-4 py-2.5 text-sm text-white/30 outline-none cursor-not-allowed"
+                className="w-full bg-dark-600/50 border border-line rounded-xl pl-8 pr-4 py-2.5 text-sm text-ink-3 outline-none cursor-not-allowed"
               />
             </div>
           </div>
 
           {/* Teléfono */}
           <div>
-            <label className="text-[10px] text-white/30 uppercase tracking-widest font-bold block mb-1.5">Teléfono</label>
+            <label className="text-[10px] text-ink-3 uppercase tracking-widest font-bold block mb-1.5">Teléfono</label>
             <div className="relative">
-              <Phone size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25" />
+              <Phone size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
               <input
                 type="tel"
                 value={form.phone}
                 onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
                 placeholder="Ej: 987654321"
-                className="w-full bg-dark-700 border border-white/8 rounded-xl pl-8 pr-4 py-2.5 text-sm text-white placeholder-white/20 outline-none focus:border-accent/50 transition-colors"
+                className="w-full bg-dark-700 border border-line rounded-xl pl-8 pr-4 py-2.5 text-sm text-white placeholder-ink-3 outline-none focus:border-accent/50 transition-colors"
               />
             </div>
           </div>

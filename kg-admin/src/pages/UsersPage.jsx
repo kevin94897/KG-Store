@@ -89,12 +89,12 @@ export default function UsersPage() {
             <Users size={20} className="text-accent" />
             Usuarios
           </h1>
-          <p className="text-white/40 text-xs mt-0.5">{users.length} usuario{users.length !== 1 ? 's' : ''} registrado{users.length !== 1 ? 's' : ''}</p>
+          <p className="text-ink-2 text-xs mt-0.5">{users.length} usuario{users.length !== 1 ? 's' : ''} registrado{users.length !== 1 ? 's' : ''}</p>
         </div>
         <button
           onClick={fetch}
           disabled={loading}
-          className="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 text-white/50 hover:text-white transition-colors"
+          className="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 text-ink-2 hover:text-white transition-colors"
         >
           <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
         </button>
@@ -102,13 +102,13 @@ export default function UsersPage() {
 
       {/* Búsqueda */}
       <div className="relative mb-4">
-        <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
+        <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3" />
         <input
           type="text"
           placeholder="Buscar por nombre, email o teléfono..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full bg-dark-700 border border-white/8 rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder-white/25 outline-none focus:border-accent/50 transition-colors"
+          className="w-full bg-dark-700 border border-line rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder-ink-3 outline-none focus:border-accent/50 transition-colors"
         />
       </div>
 
@@ -121,8 +121,8 @@ export default function UsersPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16">
-          <Users size={32} className="text-white/10 mx-auto mb-3" />
-          <p className="text-white/30 text-sm">{search ? 'Sin resultados' : 'No hay usuarios registrados'}</p>
+          <Users size={32} className="text-ink-4 mx-auto mb-3" />
+          <p className="text-ink-3 text-sm">{search ? 'Sin resultados' : 'No hay usuarios registrados'}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -130,15 +130,15 @@ export default function UsersPage() {
             <button
               key={user.id}
               onClick={() => navigate(`/usuarios/${user.id}`)}
-              className="w-full flex items-center gap-3 p-3 bg-[#111111] border border-white/5 rounded-2xl hover:border-white/10 hover:bg-[#161616] transition-all text-left"
+              className="w-full flex items-center gap-3 p-3 bg-surface border border-line rounded-2xl hover:border-line-2 hover:bg-surface-2 transition-all text-left"
             >
               <UserAvatar profile={user} />
 
               <div className="flex-1 min-w-0">
                 <p className="text-white text-sm font-semibold truncate">
-                  {user.full_name || <span className="text-white/30 italic font-normal">Sin nombre</span>}
+                  {user.full_name || <span className="text-ink-3 italic font-normal">Sin nombre</span>}
                 </p>
-                <p className="text-white/40 text-xs truncate">{user.user_email || '—'}</p>
+                <p className="text-ink-2 text-xs truncate">{user.user_email || '—'}</p>
               </div>
 
               <div className="flex items-center gap-3 shrink-0">
@@ -154,7 +154,7 @@ export default function UsersPage() {
                     <span className="text-xs font-semibold">{user.favorite_count}</span>
                   </div>
                 )}
-                <ChevronRight size={15} className="text-white/20" />
+                <ChevronRight size={15} className="text-ink-3" />
               </div>
             </button>
           ))}

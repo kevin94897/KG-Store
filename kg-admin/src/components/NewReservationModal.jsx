@@ -48,29 +48,29 @@ function UserDropdown({ users, selected, onSelect }) {
         type="button"
         onClick={() => setOpen(o => !o)}
         className={`w-full flex items-center gap-2.5 px-3 py-2.5 bg-dark-700 border rounded-xl text-sm transition-colors text-left
-          ${open ? 'border-accent/50' : 'border-white/8 hover:border-white/20'}
-          ${!selected ? 'text-white/25' : 'text-white'}`}
+          ${open ? 'border-accent/50' : 'border-line hover:border-white/20'}
+          ${!selected ? 'text-ink-3' : 'text-white'}`}
       >
         {selected
           ? <><UserAvatar profile={selected} /><span className="flex-1 truncate">{selected.full_name || selected.user_email}</span></>
-          : <><div className="w-7 h-7 rounded-full bg-white/5 border border-white/10 flex items-center justify-center"><Search size={12} className="text-white/30" /></div><span className="flex-1">Seleccionar cliente *</span></>
+          : <><div className="w-7 h-7 rounded-full bg-white/5 border border-line-2 flex items-center justify-center"><Search size={12} className="text-ink-3" /></div><span className="flex-1">Seleccionar cliente *</span></>
         }
-        <ChevronDown size={14} className={`text-white/25 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown size={14} className={`text-ink-3 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl shadow-black/60 z-50 fade-in">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-surface-2 border border-line-2 rounded-2xl overflow-hidden shadow-2xl shadow-black/60 z-50 fade-in">
           {/* Search */}
-          <div className="p-2 border-b border-white/5">
+          <div className="p-2 border-b border-line">
             <div className="relative">
-              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/25" />
+              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-3" />
               <input
                 autoFocus
                 type="text"
                 placeholder="Buscar cliente..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full bg-white/5 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-white/25 outline-none"
+                className="w-full bg-white/5 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-ink-3 outline-none"
               />
             </div>
           </div>
@@ -78,7 +78,7 @@ function UserDropdown({ users, selected, onSelect }) {
           {/* List */}
           <div className="max-h-48 overflow-y-auto">
             {filtered.length === 0 ? (
-              <p className="text-center text-white/25 text-xs py-4">Sin resultados</p>
+              <p className="text-center text-ink-3 text-xs py-4">Sin resultados</p>
             ) : filtered.map(u => (
               <button
                 key={u.id}
@@ -88,8 +88,8 @@ function UserDropdown({ users, selected, onSelect }) {
               >
                 <UserAvatar profile={u} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-white text-xs font-semibold truncate">{u.full_name || <span className="text-white/30 italic">Sin nombre</span>}</p>
-                  <p className="text-white/35 text-[10px] truncate">{u.user_email}</p>
+                  <p className="text-white text-xs font-semibold truncate">{u.full_name || <span className="text-ink-3 italic">Sin nombre</span>}</p>
+                  <p className="text-ink-3 text-[10px] truncate">{u.user_email}</p>
                 </div>
               </button>
             ))}
@@ -177,15 +177,15 @@ export default function NewReservationModal({ onClose, onCreated }) {
       style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="w-full max-w-md bg-[#111111] rounded-t-3xl md:rounded-3xl shadow-2xl fade-in max-h-[92dvh] overflow-y-auto">
+      <div className="w-full max-w-md bg-surface rounded-t-3xl md:rounded-3xl shadow-2xl fade-in max-h-[92dvh] overflow-y-auto">
 
         {/* Header */}
-        <div className="sticky top-0 bg-[#111111] flex items-center justify-between px-5 pt-5 pb-4 border-b border-white/5 z-10">
+        <div className="sticky top-0 bg-surface flex items-center justify-between px-5 pt-5 pb-4 border-b border-line z-10">
           <div>
             <h2 className="text-base font-bold text-white">Nueva reserva</h2>
-            <p className="text-white/30 text-xs mt-0.5">Creada manualmente por el admin</p>
+            <p className="text-ink-3 text-xs mt-0.5">Creada manualmente por el admin</p>
           </div>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white transition-colors">
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-ink-2 hover:text-white transition-colors">
             <X size={15} />
           </button>
         </div>
@@ -196,7 +196,7 @@ export default function NewReservationModal({ onClose, onCreated }) {
               <CheckCircle size={28} className="text-green-400" />
             </div>
             <h3 className="text-base font-bold text-white mb-2">¡Reserva creada!</h3>
-            <p className="text-white/40 text-sm mb-5">Se notificó al cliente por correo con el estado confirmado.</p>
+            <p className="text-ink-2 text-sm mb-5">Se notificó al cliente por correo con el estado confirmado.</p>
             <button onClick={onClose} className="w-full bg-accent text-black font-bold text-sm py-3 rounded-2xl">
               Cerrar
             </button>
@@ -205,41 +205,41 @@ export default function NewReservationModal({ onClose, onCreated }) {
           <div className="px-5 py-5 space-y-4">
 
             {/* Cliente */}
-            <p className="text-[10px] text-white/30 uppercase tracking-widest font-bold">Cliente</p>
+            <p className="text-[10px] text-ink-3 uppercase tracking-widest font-bold">Cliente</p>
             {loadingUsers ? (
               <div className="skeleton h-11 rounded-xl" />
             ) : (
               <UserDropdown users={users} selected={selectedUser} onSelect={setSelectedUser} />
             )}
             {/* {selectedUser && (
-              <div className="flex items-center gap-2.5 bg-white/3 border border-white/6 rounded-xl px-3 py-2.5 fade-in">
+              <div className="flex items-center gap-2.5 bg-white/3 border border-line rounded-xl px-3 py-2.5 fade-in">
                 <UserAvatar profile={selectedUser} />
                 <div className="min-w-0">
                   <p className="text-white text-xs font-semibold truncate">{selectedUser.full_name || '—'}</p>
-                  <p className="text-white/35 text-[10px] truncate">{selectedUser.user_email}</p>
+                  <p className="text-ink-3 text-[10px] truncate">{selectedUser.user_email}</p>
                 </div>
-                <button onClick={() => setSelectedUser(null)} className="ml-auto text-white/20 hover:text-white/50 transition-colors shrink-0">
+                <button onClick={() => setSelectedUser(null)} className="ml-auto text-ink-3 hover:text-ink-2 transition-colors shrink-0">
                   <X size={13} />
                 </button>
               </div>
             )} */}
 
-            <div className="border-t border-white/5 pt-1" />
+            <div className="border-t border-line pt-1" />
 
             {/* Producto */}
-            <p className="text-[10px] text-white/30 uppercase tracking-widest font-bold">Producto</p>
+            <p className="text-[10px] text-ink-3 uppercase tracking-widest font-bold">Producto</p>
             <div className="relative">
-              <Package size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25" />
+              <Package size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
               <input
                 type="text"
                 placeholder="Nombre del producto *"
                 value={form.product_name}
                 onChange={e => set('product_name', e.target.value)}
-                className="w-full bg-dark-700 border border-white/8 rounded-xl pl-8 pr-4 py-2.5 text-sm text-white placeholder-white/20 outline-none focus:border-accent/50 transition-colors"
+                className="w-full bg-dark-700 border border-line rounded-xl pl-8 pr-4 py-2.5 text-sm text-white placeholder-ink-3 outline-none focus:border-accent/50 transition-colors"
               />
             </div>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25 text-sm">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3 text-sm">
                 S/
               </span>
               <input
@@ -247,13 +247,13 @@ export default function NewReservationModal({ onClose, onCreated }) {
                 placeholder="Precio (ej: 250)"
                 value={form.product_price}
                 onChange={e => set('product_price', e.target.value)}
-                className="w-full bg-dark-700 border border-white/8 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-white/20 outline-none focus:border-accent/50 transition-colors"
+                className="w-full bg-dark-700 border border-line rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-ink-3 outline-none focus:border-accent/50 transition-colors"
               />
             </div>
 
             {/* Método de pago */}
             <div>
-              <p className="text-[10px] text-white/30 uppercase tracking-widest font-bold mb-2">Método de pago</p>
+              <p className="text-[10px] text-ink-3 uppercase tracking-widest font-bold mb-2">Método de pago</p>
               <div className="grid grid-cols-2 gap-2">
                 {METHOD_OPTIONS.map(m => (
                   <button
@@ -263,7 +263,7 @@ export default function NewReservationModal({ onClose, onCreated }) {
                     className={`px-3 py-2.5 rounded-xl border text-xs font-semibold transition-all text-left
                       ${form.payment_method === m.id
                         ? 'bg-accent/10 border-accent/40 text-accent'
-                        : 'bg-dark-700 border-white/8 text-white/50 hover:border-white/20'}`}
+                        : 'bg-dark-700 border-line text-ink-2 hover:border-white/20'}`}
                   >
                     {m.label}
                   </button>
@@ -273,13 +273,13 @@ export default function NewReservationModal({ onClose, onCreated }) {
 
             {/* Notas */}
             <div>
-              <p className="text-[10px] text-white/30 uppercase tracking-widest font-bold mb-2">Notas internas (opcional)</p>
+              <p className="text-[10px] text-ink-3 uppercase tracking-widest font-bold mb-2">Notas internas (opcional)</p>
               <textarea
                 value={form.notes}
                 onChange={e => set('notes', e.target.value)}
                 placeholder="Detalles adicionales del pedido..."
                 rows={2}
-                className="w-full bg-dark-700 border border-white/8 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/20 outline-none focus:border-accent/50 transition-colors resize-none"
+                className="w-full bg-dark-700 border border-line rounded-xl px-4 py-2.5 text-sm text-white placeholder-ink-3 outline-none focus:border-accent/50 transition-colors resize-none"
               />
             </div>
 

@@ -81,15 +81,15 @@ export default function CategoriesPage() {
 
   return (
     <div className="min-h-dvh bg-dark pb-24 pt-safe">
-      <div className="sticky top-0 bg-dark/95 backdrop-blur-xl z-10 px-4 pt-5 pb-3 border-b border-white/5">
+      <div className="sticky top-0 bg-dark/95 backdrop-blur-xl z-10 px-4 pt-5 pb-3 border-b border-line">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold text-white">Categorías</h1>
-            <p className="text-xs text-white/25">{cats.length} categorías</p>
+            <p className="text-xs text-ink-3">{cats.length} categorías</p>
           </div>
           <div className="flex items-center gap-2">
             <button onClick={() => navigate(-1)}
-              className="w-9 h-9 bg-dark-600 border border-white/5 rounded-xl flex items-center justify-center text-white/50 active:text-white shrink-0">
+              className="w-9 h-9 bg-dark-600 border border-line rounded-xl flex items-center justify-center text-ink-2 active:text-white shrink-0">
               <ArrowLeft size={18} />
             </button>
             <button
@@ -131,22 +131,22 @@ export default function CategoriesPage() {
           : cats.length === 0 && !showForm
             ? (
               <div className="text-center py-16">
-                <FolderOpen size={40} className="text-white/10 mx-auto mb-3" />
-                <p className="text-white/25 text-sm">Sin categorías todavía</p>
+                <FolderOpen size={40} className="text-ink-4 mx-auto mb-3" />
+                <p className="text-ink-3 text-sm">Sin categorías todavía</p>
               </div>
             )
             : cats.map(cat => (
               <div key={cat.id} className="card flex items-center gap-3 px-4 py-3">
                 <div className="w-10 h-10 bg-dark-600 rounded-xl flex items-center justify-center shrink-0">
-                  <Tag size={16} className="text-white/25" />
+                  <Tag size={16} className="text-ink-3" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-white">{cat.name}</p>
-                  <p className="text-xs text-white/25 font-mono">{cat.slug}</p>
+                  <p className="text-xs text-ink-3 font-mono">{cat.slug}</p>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <button onClick={() => { setEditing(cat); setShowForm(true) }}
-                    className="w-8 h-8 bg-dark-600 rounded-lg flex items-center justify-center text-white/40 active:text-white">
+                    className="w-8 h-8 bg-dark-600 rounded-lg flex items-center justify-center text-ink-2 active:text-white">
                     <Pencil size={14} />
                   </button>
                   <button onClick={() => handleDelete(cat)}

@@ -25,7 +25,7 @@ function AppRoutes() {
 
   if (loading) return (
     <div className="min-h-dvh bg-dark flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-white/10 border-t-accent rounded-full animate-spin" />
+      <div className="w-8 h-8 border-2 border-line-2 border-t-accent rounded-full animate-spin" />
     </div>
   )
 

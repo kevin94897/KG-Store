@@ -12,7 +12,7 @@ const STATUS_STYLE = {
   reviewing: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
   approved: 'bg-green-500/10 text-green-400 border-green-500/20',
   rejected: 'bg-red-500/10 text-red-400 border-red-500/20',
-  completed: 'bg-white/5 text-white border-white/8',
+  completed: 'bg-white/5 text-white border-line',
 }
 const STATUS_LABEL = {
   pending: 'Pendiente',
@@ -48,16 +48,16 @@ function RequestCard({ req, onUpdate, selected, onToggleSelect }) {
   )
 
   return (
-    <div className="bg-[#111111] border border-white/5 rounded-2xl overflow-hidden">
+    <div className="bg-surface border border-line rounded-2xl overflow-hidden">
 
       {/* ── Fila principal ── */}
-      <div className="flex items-center gap-3 p-4 bg-[#0B0B0B]">
+      <div className="flex items-center gap-3 p-4 bg-canvas">
         {/* Checkbox selección */}
         <input
           type="checkbox"
           checked={selected}
           onChange={onToggleSelect}
-          className="w-4 h-4 rounded border-white/20 bg-[#111] accent-[#CCFF00] shrink-0"
+          className="w-4 h-4 rounded border-white/20 bg-surface accent-[#CCFF00] shrink-0"
         />
 
         {/* Info resumida */}
@@ -68,8 +68,8 @@ function RequestCard({ req, onUpdate, selected, onToggleSelect }) {
               {STATUS_LABEL[status]}
             </span>
           </div>
-          <p className="text-xs text-white/40 truncate">{req.product_name}</p>
-          <div className="flex items-center gap-3 mt-0.5 text-[11px] text-white/20">
+          <p className="text-xs text-ink-2 truncate">{req.product_name}</p>
+          <div className="flex items-center gap-3 mt-0.5 text-[11px] text-ink-3">
             <span>{date}</span>
             {req.product_price && (
               <span className="text-[#CCFF00] font-bold">
@@ -96,13 +96,13 @@ function RequestCard({ req, onUpdate, selected, onToggleSelect }) {
 
       {/* ── Detalle expandido ── */}
       {open && (
-        <div className="border-t border-white/5 px-4 pb-4 pt-3 space-y-4">
+        <div className="border-t border-line px-4 pb-4 pt-3 space-y-4">
 
           {/* Contacto */}
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm">
               <User size={14} className="text-white shrink-0" />
-              <span className="text-white/60">{req.customer_name}</span>
+              <span className="text-ink">{req.customer_name}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <Mail size={14} className="text-white shrink-0" />
@@ -127,33 +127,33 @@ function RequestCard({ req, onUpdate, selected, onToggleSelect }) {
           </div>
 
           {/* Detalle del pedido */}
-          <div className="bg-[#191919] rounded-xl p-3 space-y-2">
+          <div className="bg-surface-2 rounded-xl p-3 space-y-2">
             <div className="flex items-center gap-1.5 text-xs text-white mb-2">
               <Package size={12} /> Detalle del pedido
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-white/50">Producto</span>
+              <span className="text-ink-2">Producto</span>
               <span className="text-white font-semibold text-right max-w-[60%] leading-tight">
                 {req.product_name}
               </span>
             </div>
             {req.product_price && (
               <div className="flex justify-between text-sm">
-                <span className="text-white/50">Precio total</span>
+                <span className="text-ink-2">Precio total</span>
                 <span className="text-[#CCFF00] font-bold">
                   S/{parseFloat(req.product_price).toFixed(2)}
                 </span>
               </div>
             )}
             <div className="flex justify-between text-sm">
-              <span className="text-white/50">Plan</span>
+              <span className="text-ink-2">Plan</span>
               <span className="text-white font-semibold">
                 {req.installments} cuotas {req.frequency}s
               </span>
             </div>
             {req.amount_per_installment && (
-              <div className="flex justify-between text-sm border-t border-white/5 pt-2 mt-1">
-                <span className="text-white/50">Por cuota</span>
+              <div className="flex justify-between text-sm border-t border-line pt-2 mt-1">
+                <span className="text-ink-2">Por cuota</span>
                 <span className="text-[#CCFF00] font-semibold text-base">
                   S/{parseFloat(req.amount_per_installment).toFixed(2)}
                 </span>
@@ -163,15 +163,15 @@ function RequestCard({ req, onUpdate, selected, onToggleSelect }) {
 
           {/* Notas del cliente */}
           {req.notes && (
-            <div className="bg-[#191919] rounded-xl p-3">
+            <div className="bg-surface-2 rounded-xl p-3">
               <p className="text-xs text-white mb-1">Mensaje del cliente</p>
-              <p className="text-sm text-white/60 leading-relaxed">{req.notes}</p>
+              <p className="text-sm text-ink leading-relaxed">{req.notes}</p>
             </div>
           )}
 
           {/* Cambiar estado */}
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-widest text-white/25 mb-2">
+            <label className="block text-[11px] font-bold uppercase tracking-widest text-ink-3 mb-2">
               Cambiar estado
             </label>
             <div className="relative">
@@ -179,7 +179,7 @@ function RequestCard({ req, onUpdate, selected, onToggleSelect }) {
                 value={status}
                 onChange={e => updateStatus(e.target.value)}
                 disabled={saving}
-                className="w-full bg-[#191919] border border-white/8 rounded-xl px-4 py-3
+                className="w-full bg-surface-2 border border-line rounded-xl px-4 py-3
                   text-sm text-white appearance-none outline-none
                   focus:border-[#CCFF00]/50 transition-colors pr-10 disabled:opacity-50"
               >
@@ -189,7 +189,7 @@ function RequestCard({ req, onUpdate, selected, onToggleSelect }) {
               </select>
               <ChevronDown
                 size={14}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-3 pointer-events-none"
               />
             </div>
           </div>
@@ -277,11 +277,11 @@ export default function InstallmentRequestsPage() {
 
   return (
     <div
-      className="min-h-dvh bg-[#0A0A0A] pb-24"
+      className="min-h-dvh bg-canvas pb-24"
       style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
     >
       {/* ── Header sticky ── */}
-      <div className="sticky top-0 bg-[#0A0A0A]/95 backdrop-blur-xl z-10 px-4 pt-5 pb-3 border-b border-white/5">
+      <div className="sticky top-0 bg-canvas/95 backdrop-blur-xl z-10 px-4 pt-5 pb-3 border-b border-line">
 
         {/* Título + acciones */}
         <div className="flex items-start justify-between mb-3 gap-2">
@@ -294,7 +294,7 @@ export default function InstallmentRequestsPage() {
                 </span>
               )}
             </div>
-            <p className="text-xs text-white/25">{requests.length} solicitudes en total</p>
+            <p className="text-xs text-ink-3">{requests.length} solicitudes en total</p>
           </div>
 
           {/* Botones acción + refresh */}
@@ -315,7 +315,7 @@ export default function InstallmentRequestsPage() {
                   onClick={() => setSelectedIds(new Set())}
                   disabled={busy}
                   className="text-xs font-bold px-3 py-2 rounded-xl bg-white/8
-                    text-white/50 border border-white/10 active:scale-95 transition-all disabled:opacity-40"
+                    text-ink-2 border border-line-2 active:scale-95 transition-all disabled:opacity-40"
                 >
                   Limpiar
                 </button>
@@ -323,8 +323,8 @@ export default function InstallmentRequestsPage() {
             )}
             <button
               onClick={handleRefresh}
-              className="w-9 h-9 bg-[#222] border border-white/5 rounded-xl flex items-center
-                justify-center text-white/40 active:text-white"
+              className="w-9 h-9 bg-surface-3 border border-line rounded-xl flex items-center
+                justify-center text-ink-2 active:text-white"
             >
               <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
             </button>
@@ -338,7 +338,7 @@ export default function InstallmentRequestsPage() {
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg transition-all
-                ${filter === f.key ? 'bg-[#CCFF00] text-black' : 'bg-[#191919] text-white/35'}`}
+                ${filter === f.key ? 'bg-accent text-black' : 'bg-surface-2 text-ink-3'}`}
             >
               {f.label}
               {f.key === 'pending' && pendingCount > 0 && (
@@ -353,7 +353,7 @@ export default function InstallmentRequestsPage() {
       <div className="pt-4 space-y-3">
         {loading ? (
           Array(4).fill(0).map((_, i) => (
-            <div key={i} className="bg-[#111111] border border-white/5 rounded-2xl p-4 space-y-2">
+            <div key={i} className="bg-surface border border-line rounded-2xl p-4 space-y-2">
               <div className="h-4 rounded skeleton" />
               <div className="h-3 rounded skeleton w-3/4" />
               <div className="h-3 rounded skeleton w-1/2" />
@@ -361,8 +361,8 @@ export default function InstallmentRequestsPage() {
           ))
         ) : filtered.length === 0 ? (
           <div className="text-center py-16">
-            <CreditCard size={40} className="mx-auto mb-3 text-white/8" />
-            <p className="text-sm font-semibold text-white/20">
+            <CreditCard size={40} className="mx-auto mb-3 text-ink-4" />
+            <p className="text-sm font-semibold text-ink-3">
               Sin solicitudes{filter !== 'all' ? ` "${STATUS_LABEL[filter]}"` : ''}
             </p>
           </div>
